@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from glob import glob
 import os
 import asyncpg
 import time
@@ -12,31 +11,56 @@ class BotBase(commands.Bot):
         self.token = kwargs.pop('token')
         self.owner = kwargs.pop('owner')
         self.uptime = None
+        self.db = None
         self.commandsSinceLogon = 0
-        # self.db_user = kwargs.pop('db_user')
-        # self._db = kwargs.pop('db_name')
-        # self.db_pass = kwargs.pop('db_pass')
+        self.db_user = kwargs.pop('db_user')
+        self.db_name = kwargs.pop('db_name')
+        self.db_pass = kwargs.pop('db_pass')
         super().__init__(**kwargs)
+    # self.db.execute() to execute sql commands, bot.db.execute outside of class
+
+    def load_cogs(self):
+        for file in os.listdir("./src/cogs"):
+            if file.endswith(".py"):
+                self.load_extension(f"cogs.{file[:-3]}")
 
     def start_bot(self):
         try:
-            self.run(self.token)
+            print('Connecting to database...')
+            start = time.time()
+            db = self.loop.run_until_complete(asyncpg.create_pool(database=self.db_name, user=self.db_user, password=self.db_pass))
+            print(f'Connected to database. ({round(time.time() - start, 2)})s')
+            self.db = db
+        except Exception as e:
+            print('Could not connect to database.')
+            print(e)
+        else:
             self.uptime = datetime.now()
-        except KeyboardInterrupt:
-            self.logout()
+            self.load_cogs()
+            self.run(self.token)
 
 
-bot_creds ={
+# returns database latency in milliseconds.
+
+async def check_latency(self):
+    start = time.time()
+    await BotBase.db.execute('SELECT 1;')
+    return round(start - time.time() * 1000)
+
+bot_creds = {
     "token": os.getenv('TOKEN'),
     'command_prefix': '~',
-    'owner': 701494621162963044}
+    'owner': 701494621162963044,
+    'db_user': os.getenv('DB_USER'),
+    'db_pass': os.getenv('DB_PASS'),
+    'db_name': os.getenv('DB_NAME')}
 
-bot = BotBase(**bot_creds)
+client = BotBase(**bot_creds)
 
 
-@bot.event
+@client.event
 async def on_ready():
     print(f'Bot connected on {time.strftime("%m/%d/%Y, %H:%M:%S")}')
 
 if __name__ == '__main__':
-    bot.start_bot()
+    client.start_bot()

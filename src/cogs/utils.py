@@ -1,19 +1,21 @@
 import discord
 from discord.ext import commands
-from src.bot import check_latency
 
 
 class Utilities(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print(f'Cog {__name__} loaded')
-
     @commands.command()
     async def ping(self, ctx):
-        await ctx.send(f'Pong! {await check_latency(self)}')
+        desc_embed = f'<:dataserver:790987826744393768> **Websocket**:`{round(self.bot.latency * 1000, 2)}`\n\n<:PostgreSQL:791377151991611412> **Database**:`{await self.bot.check_latency()}`'
+
+        embed = discord.Embed(
+            title='Latency:',
+            description=desc_embed,
+            color=discord.Color(0x25262b)
+        )
+        message = await ctx.send(embed=embed)
 
 
 def setup(bot):

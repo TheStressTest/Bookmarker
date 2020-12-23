@@ -39,13 +39,13 @@ class BotBase(commands.Bot):
             self.load_cogs()
             self.run(self.token)
 
+    async def check_latency(self):
+        start = time.time()
+        await self.db.execute('SELECT 1;')
+        return round((time.time() - start) * 1000, 2)
+
 
 # returns database latency in milliseconds.
-
-async def check_latency(self):
-    start = time.time()
-    await BotBase.db.execute('SELECT 1;')
-    return round(start - time.time() * 1000)
 
 bot_creds = {
     "token": os.getenv('TOKEN'),

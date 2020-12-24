@@ -23,6 +23,7 @@ class BotBase(commands.Bot):
         for file in os.listdir("./src/cogs"):
             if file.endswith(".py"):
                 self.load_extension(f"cogs.{file[:-3]}")
+        self.load_extension('jishaku')
 
     def start_bot(self):
         try:

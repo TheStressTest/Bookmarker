@@ -9,13 +9,12 @@ class Reminder(commands.Cog):
         self.bot = bot
 
     @commands.command(name='remind')
-    async def _remind(self, ctx, time):
+    async def _remind(self, ctx, time, *, reason='No reason.'):
+        """"~remind <time> [reason]"""
         converted_time = await convert_time(time)
-        print(converted_time)
-        print(type(converted_time))
-        if int(converted_time) <= 86400:
-            await asyncio.sleep(convert_time(time))
-            await ctx.send('Done!')
+        if converted_time <= 86400:
+            await asyncio.sleep(converted_time)
+            await ctx.send(f'Done! You have been reminded for {reason} {ctx.author.mention}')
         else:
             await ctx.send('Invalid time format! Max time is 24 hours.')
 

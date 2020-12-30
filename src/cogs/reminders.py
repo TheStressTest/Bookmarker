@@ -11,7 +11,9 @@ class Reminder(commands.Cog):
     @commands.command(name='remind')
     async def _remind(self, ctx, time):
         converted_time = await convert_time(time)
-        if int(converted_time) >= 86400:
+        print(converted_time)
+        print(type(converted_time))
+        if int(converted_time) <= 86400:
             await asyncio.sleep(convert_time(time))
             await ctx.send('Done!')
         else:

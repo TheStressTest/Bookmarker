@@ -9,7 +9,7 @@ from datetime import datetime
 class BotBase(commands.Bot):
     def __init__(self, **kwargs):
         self.token = kwargs.pop('token')
-        self.owner = kwargs.pop('owner')
+        self.testers = kwargs.pop('testers')
         self.uptime = None
         self.db = None
         self.commandsSinceLogon = 0
@@ -40,18 +40,17 @@ class BotBase(commands.Bot):
             self.load_cogs()
             self.run(self.token)
 
+# returns database latency in milliseconds.
     async def check_latency(self):
         start = time.time()
         await self.db.execute('SELECT 1;')
         return round((time.time() - start) * 1000, 2)
 
 
-# returns database latency in milliseconds.
-
 bot_creds = {
     "token": os.getenv('TOKEN'),
+    'testers': [],
     'command_prefix': '~',
-    'owner': 701494621162963044,
     'db_user': os.getenv('DB_USER'),
     'db_pass': os.getenv('DB_PASS'),
     'db_name': os.getenv('DB_NAME')}

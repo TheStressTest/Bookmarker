@@ -25,7 +25,7 @@ class Bookmark(commands.Cog):
     async def _bookmarks(self, ctx):
         bookmarks = await self.bot.db.fetch('SELECT * from bookmarks WHERE bookmark_owner_id = $1',
                                             ctx.author.id)
-        description_text = ''
+        description_text = f'Total Bookmarks: {len(bookmarks)}\n'
         for bookmark in bookmarks:
             channel = self.bot.get_channel(bookmark['channel_id'])
             message_id = bookmark['message_id']
@@ -36,7 +36,7 @@ class Bookmark(commands.Cog):
         embed = discord.Embed(
             description=description_text
         )
-
+        embed.set_author(name='Your bookmarks:')
         await ctx.send(embed=embed)
 
 

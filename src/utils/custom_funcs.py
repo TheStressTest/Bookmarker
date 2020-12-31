@@ -2,6 +2,7 @@ from src.utils.errors import InvalidTimeFormat
 
 
 async def trim_message(message, length: int = 12):
+    """Trims a message and adds ... at the end"""
     if len(message) <= length:
         return message
     else:
@@ -9,6 +10,7 @@ async def trim_message(message, length: int = 12):
 
 
 async def time_convert(time):
+    """Converts something like 10m into 600 seconds."""
     if time[-1:].lower() == 's':
         formatted_time = int(time[:-1])
     elif time[-1:].lower() == 'm':

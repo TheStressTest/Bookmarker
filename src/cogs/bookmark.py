@@ -5,7 +5,7 @@ from discord.ext import commands
 from src.utils.custom_funcs import trim_message
 
 
-class Bookmark(commands.Cog):
+class Bookmarking(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -21,7 +21,9 @@ class Bookmark(commands.Cog):
     async def test(self, ctx, bookmark_id):
         await ctx.send(bookmark_id)
 
-    @commands.command(name='bookmarks')
+    @commands.command(name='bookmarks',
+                      brief='View your bookmarks.',
+                      help='Use ~bookmarks to view all your bookmarks, you can add and remove folders.')
     async def _bookmarks(self, ctx):
         bookmarks = await self.bot.db.fetch('SELECT * from bookmarks WHERE bookmark_owner_id = $1',
                                             ctx.author.id)
@@ -41,4 +43,4 @@ class Bookmark(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Bookmark(bot))
+    bot.add_cog(Bookmarking(bot))

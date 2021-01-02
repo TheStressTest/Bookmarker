@@ -1,16 +1,19 @@
-import discord
 import asyncio
 from discord.ext import commands
 from src.utils.custom_funcs import time_convert as convert_time
+from discord.ext import flags
 
 
-class Reminder(commands.Cog):
+class Reminders(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='remind')
+    @commands.command(name='remind',
+                      help='Use ~remind <time> [reason] to remind yourself in X amount of minutes, example: ~remind 12m take out the cookies!',
+                      brief='Give yourself a reminder.')
     async def _remind(self, ctx, time, *, reason='No reason.'):
         """"~remind <time> [reason]"""
+        print(flags['repeat'])
         converted_time = await convert_time(time)
         if converted_time <= 86400:
             await asyncio.sleep(converted_time)
@@ -20,4 +23,4 @@ class Reminder(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Reminder(bot))
+    bot.add_cog(Reminders(bot))

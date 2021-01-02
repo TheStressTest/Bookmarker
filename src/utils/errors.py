@@ -9,8 +9,3 @@ class InvalidTimeFormat(commands.CommandInvokeError):
 class NotATesterError(commands.CommandInvokeError):
     """Gets raised when someone is not in self.bot.testers"""
     pass
-
-
-class InBotBlacklistError(commands.CommandError):
-    """Gets raised when someone is in the bot blacklist"""
-    pass

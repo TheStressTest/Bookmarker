@@ -5,6 +5,7 @@ import asyncpg
 import time
 from datetime import datetime
 from src.utils.custom_context import NewContext
+from src.utils.cache import Cache
 
 
 class BotBase(commands.Bot):
@@ -15,6 +16,7 @@ class BotBase(commands.Bot):
         self.ignored_cogs = kwargs.pop('ignored_cogs')
         self.uptime = None
         self.db = None
+        self.cache = None
         self.commandsSinceLogon = 0
         self.db_user = kwargs.pop('db_user')
         self.db_name = kwargs.pop('db_name')
@@ -56,6 +58,7 @@ class BotBase(commands.Bot):
         start = time.time()
         await self.db.execute('SELECT 1;')
         return round((time.time() - start) * 1000, 2)
+
 
 
 bot_creds = {

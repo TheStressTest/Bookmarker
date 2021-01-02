@@ -1,11 +1,16 @@
-from discord.ext.commands import CommandInvokeError
+from discord.ext import commands
 
 
-class InvalidTimeFormat(CommandInvokeError):
+class InvalidTimeFormat(commands.CommandInvokeError):
     """Gets raised when converting time in src/utils/custom_funcs fails"""
     pass
 
 
-class NotATesterError(CommandInvokeError):
+class NotATesterError(commands.CommandInvokeError):
     """Gets raised when someone is not in self.bot.testers"""
+    pass
+
+
+class InBotBlacklistError(commands.CommandError):
+    """Gets raised when someone is in the bot blacklist"""
     pass

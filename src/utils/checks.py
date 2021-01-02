@@ -10,3 +10,4 @@ def is_a_tester():
         else:
             raise NotATesterError
     return commands.check(predicate)
+

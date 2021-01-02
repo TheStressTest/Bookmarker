@@ -1,7 +1,6 @@
 import asyncio
 from discord.ext import commands
 from src.utils.custom_funcs import time_convert as convert_time
-from discord.ext import flags
 
 
 class Reminders(commands.Cog):
@@ -13,11 +12,10 @@ class Reminders(commands.Cog):
                       brief='Give yourself a reminder.')
     async def _remind(self, ctx, time, *, reason='No reason.'):
         """"~remind <time> [reason]"""
-        print(flags['repeat'])
         converted_time = await convert_time(time)
         if converted_time <= 86400:
             await asyncio.sleep(converted_time)
-            await ctx.send(f'Done! You have been reminded for {reason} {ctx.author.mention}')
+            await ctx.clean_send(f'Done! You have been reminded for {reason} {ctx.author.mention}')
         else:
             await ctx.send('Invalid time format! Max time is 24 hours.')
 

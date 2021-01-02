@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 import time
-import asyncio
 
 
 class Utilities(commands.Cog):

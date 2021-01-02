@@ -17,10 +17,6 @@ class Bookmarking(commands.Cog):
 
         await ctx.send('Bookmark added!')
 
-    @_bookmark.command(name='remove')
-    async def test(self, ctx, bookmark_id):
-        await ctx.send(bookmark_id)
-
     @commands.command(name='bookmarks',
                       brief='View your bookmarks.',
                       help='Use ~bookmarks to view all your bookmarks, you can add and remove folders.')
@@ -40,6 +36,20 @@ class Bookmarking(commands.Cog):
         )
         embed.set_author(name='Your bookmarks:')
         await ctx.send(embed=embed)
+
+    @_bookmark.command(name='remove',
+                       brief='Remove a bookmark.',
+                       help='Remove a bookmark by using ~bookmark remove <id>')
+    async def _remove_bookmark(self, ctx, bookmark_id: int):
+
+        confirm = await ctx.prompt('Are you sure you would like to delete this bookmark?')
+
+        if not confirm:
+            await ctx.better_send('Aborting.')
+        else:
+            await self.bot.db.execute('DELETE FROM bookmarks WHERE database_id=$1 AND bookmark_owner_id=$2',
+                                      bookmark_id, ctx.author.id)
+            await ctx.send('Successfully deleted bookmark.')
 
 
 def setup(bot):

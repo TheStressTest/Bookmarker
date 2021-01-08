@@ -1,14 +1,14 @@
-from discord.ext import commands
 import os
 import re
 import asyncpg
 import time
+
+from discord.ext import commands
 from datetime import datetime
 from src.utils.custom_context import NewContext
-from src.utils.cache import Cache
 
 
-class BotBase(commands.Bot):
+class BotBase(commands.AutoShardedBot):
     def __init__(self, **kwargs):
         self.user_blacklist = []
         self.token = kwargs.pop('token')
@@ -49,7 +49,7 @@ class BotBase(commands.Bot):
             print('Could not connect to database.')
             print(e)
         else:
-            self.uptime = datetime.now()
+            self.uptime = datetime.utcnow()
             self.load_cogs()
             self.run(self.token)
 

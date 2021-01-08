@@ -1,11 +1,17 @@
 import discord
 from discord.ext import commands
 import time
+import os
+import psutil
+import datetime
+import humanize
+import sys
 
 
 class Utilities(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.process = psutil.Process()
 
     @commands.command(name='ping',
                       brief='Check out the ping of the bot.',
@@ -16,7 +22,7 @@ class Utilities(commands.Cog):
         embed = discord.Embed(
             title='Latency:',
             description=desc_embed,
-            color=discord.Color(0x25262b)
+            color=discord.Color(0x2F3136)
         )
         start = time.time()
         message = await ctx.send(embed=embed)
@@ -24,7 +30,7 @@ class Utilities(commands.Cog):
         embed = discord.Embed(
             title='Latency:',
             description=desc_embed,
-            color=discord.Color(0x25262b)
+            color=discord.Color(0x2F3136)
         )
         await message.edit(embed=embed)
 
@@ -33,6 +39,16 @@ class Utilities(commands.Cog):
                       help='Use ~stats to get info on me such as how many commands were run since the last restart or how much ram Im using, stuff like that.')
     async def _stats(self, ctx):
         await ctx.send(f'Commands since last reboot: {self.bot.commandsSinceLogon}\nI am currently in {len(self.bot.guilds)} guilds.')
+
+    @commands.command(name='system', aliases=['sys'], help='Get useful information about the system, including ram, physical memory, process id, uptime & much more.', brief='Get system info.')
+    async def _sys(self, ctx):
+        embed = discord.Embed(
+            title='System Information:',
+            color=discord.Color(0x2F3136),
+        )
+        embed.add_field(name='**System:**', value=f'**Current OS:** `{sys.platform}`\n**Uptime:** `{humanize.naturaldelta(self.bot.uptime - datetime.datetime.utcnow())}`\n**Started at:** `{self.bot.uptime}`', inline=False)
+        embed.add_field(name='\n**Memory:**', value=f'**Ram:** `{psutil.virtual_memory().percent}%`\n**PID:** `{os.getpid()}`\n**Physical memory:** `{humanize.naturalsize(self.process.memory_info().rss)}`')
+        await ctx.send(embed=embed)
 
 
 def setup(bot):

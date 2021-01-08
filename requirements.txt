@@ -16,3 +16,4 @@ six==1.15.0
 timeago==1.0.15
 typing-extensions==3.7.4.3
 yarl==1.6.3
+psutil~=5.8.0

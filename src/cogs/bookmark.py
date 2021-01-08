@@ -1,45 +1,117 @@
 import timeago
 import discord
+import shlex
+import argparse
+import asyncio
+
 from datetime import datetime
 from discord.ext import commands
 from src.utils.custom_funcs import trim_message
+
+
+class Arguments(argparse.ArgumentParser):
+    def error(self, message):
+        raise RuntimeError(message)
 
 
 class Bookmarking(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(name='bookmark', invoke_without_command=True)
-    async def _bookmark(self, ctx, message: discord.Message):
+    @commands.group(name='bookmark', invoke_without_command=True,
+                    help='Add a bookmark by copying the ID or link of a message then using ~bookmark <id/link> you will only be able to get the jump url if you are viewing your bookmarks in the same server that you created them in. To avoid this use the flag --global when you create your bookmark.',
+                    brief='Create a bookmark with some flags.',
+                    flags={'--hidden': 'Makes your bookmark hidden to view hidden bookmarks run ~bookmarks --show-hidden',
+                           '--global': 'Makes your '})
+    async def _bookmark(self, ctx, message: discord.Message, *, args: str = ''):
+        parser = Arguments(add_help=False, allow_abbrev=False)
+        parser.add_argument('--global', action='store_true', dest='is_global')
+        parser.add_argument('--hidden', action='store_true')
+        try:
+            args = parser.parse_args(shlex.split(args))
+        except Exception as e:
+            await ctx.send(e)
+
         await self.bot.db.execute(
-            'INSERT INTO bookmarks (bookmark_owner_id, message_id, channel_id) VALUES ($1, $2, $3)',
-            ctx.author.id, message.id, message.channel.id)
+            'INSERT INTO bookmarks (bookmark_owner_id, message_id, channel_id, is_global, is_hidden) VALUES ($1, $2, $3, $4, $5)',
+            ctx.author.id, message.id, message.channel.id, args.is_global, args.hidden)
 
         await ctx.send('Bookmark added!')
 
     @commands.command(name='bookmarks',
                       brief='View your bookmarks.',
-                      help='Use ~bookmarks to view all your bookmarks, you can add and remove folders.')
-    async def _bookmarks(self, ctx):
+                      help='Use ~bookmarks to view all your bookmarks, you can add and remove folders.',
+                      flags={'`--show-hidden`': 'Displays private flags (No arguments required.)'})
+    async def _bookmarks(self, ctx, *, args: str = ''):
+        dm = False
+
+        # arg parse stuff
+        parser = Arguments(add_help=False, allow_abbrev=False)
+        parser.add_argument('--show-hidden', action='store_true', dest='hidden')
+        try:
+            args = parser.parse_args(shlex.split(args))
+        except Exception as e:
+            await ctx.send(e)
+
+        if args.hidden:
+            dm = True
+        paginator = commands.Paginator(prefix='', suffix='')
         bookmarks = await self.bot.db.fetch('SELECT * from bookmarks WHERE bookmark_owner_id = $1',
                                             ctx.author.id)
-        description_text = f'Total Bookmarks: {len(bookmarks)}\n'
+        paginator.add_line(f'Total Bookmarks: {len(bookmarks)}\n')
         for bookmark in bookmarks:
             channel = self.bot.get_channel(bookmark['channel_id'])
             message_id = bookmark['message_id']
+            try:
+                message_info = await channel.fetch_message(message_id)
+                if not dm:
 
-            message_info = await channel.fetch_message(message_id)
-            description_text += f'\n[`{await trim_message(message_info.content)}`]({message_info.jump_url}) • {timeago.format(message_info.created_at, datetime.utcnow())}'
+                    if bookmark['is_global'] or message_info.guild.id == ctx.guild.id and not bookmark['is_hidden']:
+                        paginator.add_line(f'[`{await trim_message(message_info.content)}`]({message_info.jump_url}) • {timeago.format(message_info.created_at, datetime.utcnow())}')
 
-        embed = discord.Embed(
-            description=description_text
-        )
-        embed.set_author(name='Your bookmarks:')
-        await ctx.send(embed=embed)
+                    elif not bookmark['is_hidden']:
+                        paginator.add_line(f'`{await trim_message(message_info.content)}` • {timeago.format(message_info.created_at, datetime.utcnow())}')
+
+                else:
+                    paginator.add_line(f'[`{await trim_message(message_info.content)}`]({message_info.jump_url}) • {timeago.format(message_info.created_at, datetime.utcnow())}')
+
+            except (AttributeError, discord.NotFound):
+                await self.bot.db.execute('DELETE FROM bookmarks WHERE message_id = $1', message_id)
+
+                paginator.add_line(f'`Deleted message.`')
+
+        for page in paginator.pages:
+            embed = discord.Embed(
+                description=page,
+                color=discord.Color(0x2F3136)
+            )
+            embed.set_author(name='Your bookmarks:')
+            embed.set_footer(text='React with \U00002139 to get some useful info.')
+            author = ctx.author
+            if dm:
+                await author.send(embed=embed)
+            else:
+
+                message = await ctx.send(embed=embed)
+
+                def is_proper(reaction, user):
+                    return user == ctx.author and str(reaction.emoji) == '\U00002139'
+
+                await message.add_reaction('\U00002139')
+
+                try:
+                    reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=is_proper)
+
+                except asyncio.TimeoutError:
+
+                    embed.set_footer(text='Expired!')
+                else:
+                    embed.set_footer(text='Some messages may not have links and this is because they were bookmarked in another guild. If you would like to access all of your bookmarks with links run ~bookmarks --show-hidden. If you would like a bookmark to accessible anywhere use the flag --global when creating it.')
+                    await message.edit(embed=embed)
 
     @_bookmark.command(name='remove',
                        brief='Remove a bookmark.',
-                       help='Remove a bookmark by using ~bookmark remove <id>')
+                       help=f'Delete a bookmark using the ID. You can access the ID by reacting to the `ID` reaction when you view your bookmarks.')
     async def _remove_bookmark(self, ctx, bookmark_id: int):
 
         confirm = await ctx.prompt('Are you sure you would like to delete this bookmark?')

@@ -52,3 +52,22 @@ class NewContext(commands.Context):
                 await message.delete()
         finally:
             return confirm
+
+    async def temp_send(self, content=None, **kwargs):
+        """Reacts to the message with a wastebin emoji, if it is reacted to by the author, it will delete the message."""
+        author_id = self.author.id
+        message = await self.send(content, **kwargs)
+
+        def check(payload):
+            if payload.message_id != message.id or payload.user_id != author_id:
+                return False
+            else:
+                return True
+
+        await message.add_reaction('\U0001f5d1')
+        try:
+            await self.bot.wait_for('raw_reaction_add', check=check, timeout=120)
+        except asyncio.TimeoutError:
+            await message.delete()
+        else:
+            await message.delete()

@@ -21,8 +21,9 @@ class Bookmarking(commands.Cog):
     @commands.group(name='bookmark', invoke_without_command=True,
                     help='Add a bookmark by copying the ID or link of a message then using ~bookmark <id/link> you will only be able to get the jump url if you are viewing your bookmarks in the same server that you created them in. To avoid this use the flag --global when you create your bookmark.',
                     brief='Create a bookmark with some flags.',
-                    flags={'--hidden': 'Makes your bookmark hidden to view hidden bookmarks run ~bookmarks --show-hidden',
-                           '--global': 'Makes your '})
+                    flags={
+                        '--hidden': 'Makes your bookmark hidden to view hidden bookmarks run ~bookmarks --show-hidden',
+                        '--global': 'Creates a bookmark that will have a link regardless of what guild you are in.'})
     async def _bookmark(self, ctx, message: discord.Message, *, args: str = ''):
         parser = Arguments(add_help=False, allow_abbrev=False)
         parser.add_argument('--global', action='store_true', dest='is_global')
@@ -41,7 +42,7 @@ class Bookmarking(commands.Cog):
     @commands.command(name='bookmarks',
                       brief='View your bookmarks.',
                       help='Use ~bookmarks to view all your bookmarks, you can add and remove folders.',
-                      flags={'`--show-hidden`': 'Displays private flags (No arguments required.)'})
+                      flags={'--show-hidden': 'Displays private flags (No arguments required.)'})
     async def _bookmarks(self, ctx, *, args: str = ''):
         dm = False
 
@@ -67,13 +68,16 @@ class Bookmarking(commands.Cog):
                 if not dm:
 
                     if bookmark['is_global'] or message_info.guild.id == ctx.guild.id and not bookmark['is_hidden']:
-                        paginator.add_line(f'[`{await trim_message(message_info.content)}`]({message_info.jump_url}) • {timeago.format(message_info.created_at, datetime.utcnow())}')
+                        paginator.add_line(
+                            f'[`{await trim_message(message_info.content)}`]({message_info.jump_url}) • {timeago.format(message_info.created_at, datetime.utcnow())}')
 
                     elif not bookmark['is_hidden']:
-                        paginator.add_line(f'`{await trim_message(message_info.content)}` • {timeago.format(message_info.created_at, datetime.utcnow())}')
+                        paginator.add_line(
+                            f'`{await trim_message(message_info.content)}` • {timeago.format(message_info.created_at, datetime.utcnow())}')
 
                 else:
-                    paginator.add_line(f'[`{await trim_message(message_info.content)}`]({message_info.jump_url}) • {timeago.format(message_info.created_at, datetime.utcnow())}')
+                    paginator.add_line(
+                        f'[`{await trim_message(message_info.content)}`]({message_info.jump_url}) • {timeago.format(message_info.created_at, datetime.utcnow())}')
 
             except (AttributeError, discord.NotFound):
                 await self.bot.db.execute('DELETE FROM bookmarks WHERE message_id = $1', message_id)
@@ -86,9 +90,10 @@ class Bookmarking(commands.Cog):
                 color=discord.Color(0x2F3136)
             )
             embed.set_author(name='Your bookmarks:')
-            embed.set_footer(text='React with \U00002139 to get some useful info.')
+            if not dm: embed.set_footer(text='React with \U00002139 to get some useful info.')
             author = ctx.author
             if dm:
+                await ctx.message.add_reaction('\U0001f4ec')
                 await author.send(embed=embed)
             else:
 
@@ -106,22 +111,25 @@ class Bookmarking(commands.Cog):
 
                     embed.set_footer(text='Expired!')
                 else:
-                    embed.set_footer(text='Some messages may not have links and this is because they were bookmarked in another guild. If you would like to access all of your bookmarks with links run ~bookmarks --show-hidden. If you would like a bookmark to accessible anywhere use the flag --global when creating it.')
+                    embed.set_footer(
+                        text='Some messages may not have links and this is because they were bookmarked in another guild. If you would like to access all of your bookmarks with links run ~bookmarks --show-hidden. If you would like a bookmark to accessible anywhere use the flag --global when creating it.')
                     await message.edit(embed=embed)
 
-    @_bookmark.command(name='remove',
+    @_bookmark.command(name='remove', aliases=['del', 'delete'],
                        brief='Remove a bookmark.',
                        help=f'Delete a bookmark using the ID. You can access the ID by reacting to the `ID` reaction when you view your bookmarks.')
     async def _remove_bookmark(self, ctx, bookmark_id: int):
+        if await self.bot.db.fetch('SELECT FROM bookmarks WHERE database_id=$1 AND bookmark_owner_id=$2', bookmark_id, ctx.author.id):
+            confirm = await ctx.prompt('Are you sure you would like to delete this bookmark?')
 
-        confirm = await ctx.prompt('Are you sure you would like to delete this bookmark?')
-
-        if not confirm:
-            await ctx.better_send('Aborting.')
+            if not confirm:
+                await ctx.better_send('Aborting.')
+            else:
+                await self.bot.db.execute('DELETE FROM bookmarks WHERE database_id=$1 AND bookmark_owner_id=$2',
+                                          bookmark_id, ctx.author.id)
+                await ctx.temp_send('Successfully deleted bookmark.')
         else:
-            await self.bot.db.execute('DELETE FROM bookmarks WHERE database_id=$1 AND bookmark_owner_id=$2',
-                                      bookmark_id, ctx.author.id)
-            await ctx.send('Successfully deleted bookmark.')
+            await ctx.temp_send('Could not find bookmark, are you sure it exists or you own it?')
 
 
 def setup(bot):

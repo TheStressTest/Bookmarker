@@ -1,11 +1,13 @@
 import discord
-from discord.ext import commands
 import time
 import os
 import psutil
 import datetime
 import humanize
+import platform
 import sys
+
+from discord.ext import commands
 
 
 class Utilities(commands.Cog):
@@ -46,9 +48,10 @@ class Utilities(commands.Cog):
             title='System Information:',
             color=discord.Color(0x2F3136),
         )
-        embed.add_field(name='**System:**', value=f'**Current OS:** `{sys.platform}`\n**Uptime:** `{humanize.naturaldelta(self.bot.uptime - datetime.datetime.utcnow())}`\n**Started at:** `{self.bot.uptime}`', inline=False)
+        embed.add_field(name='**System:**', value=f'**Current OS:** `{platform.system()} {platform.architecture()[0]}`\n**Python Version:** `{platform.python_version()}`\n**Uptime:** `{humanize.naturaldelta(self.bot.uptime - datetime.datetime.utcnow())}`\n**Started at:** `{self.bot.uptime}`', inline=False)
         embed.add_field(name='\n**Memory:**', value=f'**Ram:** `{psutil.virtual_memory().percent}%`\n**PID:** `{os.getpid()}`\n**Physical memory:** `{humanize.naturalsize(self.process.memory_info().rss)}`')
-        await ctx.send(embed=embed)
+        embed.add_field(name='Specs:', value=f'**Processor:** `{platform.processor()}`\n**Total ram:** `{humanize.naturalsize(psutil.virtual_memory().total)}`\n**CPU Count:** `{psutil.cpu_count()}`', inline=False)
+        await ctx.temp_send(embed=embed)
 
 
 def setup(bot):

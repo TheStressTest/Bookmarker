@@ -6,6 +6,7 @@ import time
 from discord.ext import commands
 from datetime import datetime
 from src.utils.custom_context import NewContext
+from src.utils.errors import CurrentlyDevModeError
 
 
 class BotBase(commands.AutoShardedBot):
@@ -14,6 +15,7 @@ class BotBase(commands.AutoShardedBot):
         self.token = kwargs.pop('token')
         self.testers = kwargs.pop('testers')
         self.ignored_cogs = kwargs.pop('ignored_cogs')
+        self.is_dev_mode = False
         self.uptime = None
         self.db = None
         self.cache = None
@@ -78,16 +80,24 @@ async def on_ready():
     print(f'Bot connected on {time.strftime("%m/%d/%Y, %H:%M:%S")}')
 
 
+@client.check
+async def is_dev_mode(ctx):
+    if client.is_dev_mode and ctx.author.id != client.owner_id:
+        raise CurrentlyDevModeError
+    else:
+        return True
+
+
 @client.event
 async def on_message(message):
     """Runs a few checks on every message that is sent."""
     if message.author.id == client.user.id:
         return
-    elif message.author.id in client.user_blacklist:
+    if message.author.id in client.user_blacklist:
         return
-    elif re.fullmatch("<@(!)?790632534350233630>", message.content):
+    if re.fullmatch("<@(!)?790632534350233630>", message.content):
         await message.channel.send(f'Hello! I am {client.user.name}. My prefix is "{client.command_prefix}". Use {client.command_prefix}help to get a list of commands.')
-    elif message.author.bot:
+    if message.author.bot:
         return
 
     await client.process_commands(message)

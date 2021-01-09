@@ -39,16 +39,21 @@ class Bookmarking(commands.Cog):
 
         await ctx.send('Bookmark added!')
 
+
+
+
     @commands.command(name='bookmarks',
                       brief='View your bookmarks.',
                       help='Use ~bookmarks to view all your bookmarks, you can add and remove folders.',
-                      flags={'--show-hidden': 'Displays private flags (No arguments required.)'})
+                      flags={'--show-hidden': 'Displays private flags (No arguments required.)',
+                             '--show-id': 'Shows the id\'s of the bookmark.}'})
     async def _bookmarks(self, ctx, *, args: str = ''):
         dm = False
 
         # arg parse stuff
         parser = Arguments(add_help=False, allow_abbrev=False)
         parser.add_argument('--show-hidden', action='store_true', dest='hidden')
+        parser.add_argument('--show-id', action='store_true', dest='show_id')
         try:
             args = parser.parse_args(shlex.split(args))
         except Exception as e:
@@ -61,29 +66,39 @@ class Bookmarking(commands.Cog):
                                             ctx.author.id)
         paginator.add_line(f'Total Bookmarks: {len(bookmarks)}\n')
         for bookmark in bookmarks:
+
+            # configures message
             channel = self.bot.get_channel(bookmark['channel_id'])
             message_id = bookmark['message_id']
+            message_info = await channel.fetch_message(message_id)
+
+            if not args.show_id:
+                info = timeago.format(message_info.created_at, datetime.utcnow())
+            else:
+                info = bookmark['database_id']
             try:
-                message_info = await channel.fetch_message(message_id)
                 if not dm:
 
                     if bookmark['is_global'] or message_info.guild.id == ctx.guild.id and not bookmark['is_hidden']:
                         paginator.add_line(
-                            f'[`{await trim_message(message_info.content)}`]({message_info.jump_url}) • {timeago.format(message_info.created_at, datetime.utcnow())}')
+                            f'[`{await trim_message(message_info.content)}`]({message_info.jump_url}) • {info}')
 
                     elif not bookmark['is_hidden']:
                         paginator.add_line(
-                            f'`{await trim_message(message_info.content)}` • {timeago.format(message_info.created_at, datetime.utcnow())}')
+                            f'`{await trim_message(message_info.content)}` • {info}')
 
                 else:
                     paginator.add_line(
-                        f'[`{await trim_message(message_info.content)}`]({message_info.jump_url}) • {timeago.format(message_info.created_at, datetime.utcnow())}')
+                        f'[`{await trim_message(message_info.content)}`]({message_info.jump_url}) • {info}')
 
             except (AttributeError, discord.NotFound):
                 await self.bot.db.execute('DELETE FROM bookmarks WHERE message_id = $1', message_id)
 
                 paginator.add_line(f'`Deleted message.`')
 
+
+
+        # sends message, TODO add menu
         for page in paginator.pages:
             embed = discord.Embed(
                 description=page,
@@ -99,21 +114,28 @@ class Bookmarking(commands.Cog):
 
                 message = await ctx.send(embed=embed)
 
-                def is_proper(reaction, user):
-                    return user == ctx.author and str(reaction.emoji) == '\U00002139'
+                def check(payload):
+                    if payload.message_id != message.id or payload.user_id != ctx.author.id:
+                        return False
+                    else:
+                        return True
 
                 await message.add_reaction('\U00002139')
 
                 try:
-                    reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=is_proper)
+                    await self.bot.wait_for('raw_reaction_add', check=check, timeout=120)
 
                 except asyncio.TimeoutError:
 
                     embed.set_footer(text='Expired!')
                 else:
                     embed.set_footer(
-                        text='Some messages may not have links and this is because they were bookmarked in another guild. If you would like to access all of your bookmarks with links run ~bookmarks --show-hidden. If you would like a bookmark to accessible anywhere use the flag --global when creating it.')
+                        text='If you would like to view the id\' of the bookmark use the flag --show-id. Some messages may not have links and this is because they were bookmarked in another guild. If you would like to access all of your bookmarks with links run ~bookmarks --show-hidden. If you would like a bookmark to accessible anywhere use the flag --global when creating it.')
                     await message.edit(embed=embed)
+
+
+
+
 
     @_bookmark.command(name='remove', aliases=['del', 'delete'],
                        brief='Remove a bookmark.',

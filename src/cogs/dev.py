@@ -1,10 +1,9 @@
 import discord
 from discord.ext import commands
 from tabulate import tabulate
-from asyncpg import exceptions
 
 
-class DevTools(commands.Cog):
+class DevTools(commands.Cog, command_attrs=dict(hidden=True)):
     def __init__(self, bot):
         self.bot = bot
 

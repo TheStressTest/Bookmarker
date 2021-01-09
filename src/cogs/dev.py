@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from tabulate import tabulate
+from asyncpg import exceptions
 
 
 class DevTools(commands.Cog):
@@ -27,8 +28,13 @@ class DevTools(commands.Cog):
     @commands.is_owner()
     @commands.command(name='sql')
     async def _sql(self, ctx, *, query):
-        values = await self.bot.db.fetch(query)
-        await ctx.send(f'```\n{tabulate(values, list(values[0].keys()), tablefmt="psql")}\n```')
+        import time
+        try:
+            start = time.time()
+            values = await self.bot.db.fetch(query)
+            await ctx.temp_send(f'```\n{tabulate(values, list(values[0].keys()), tablefmt="psql")}\nSelected {len(values)} row(s) in {round(time.time() - start, 2)}s\n```')
+        except Exception as e:
+            await ctx.temp_send(f'```\n{e}\n```')
 
 
 def setup(bot):

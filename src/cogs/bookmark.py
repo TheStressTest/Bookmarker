@@ -41,7 +41,6 @@ class Bookmarking(commands.Cog):
 
 
 
-
     @commands.command(name='bookmarks',
                       brief='View your bookmarks.',
                       help='Use ~bookmarks to view all your bookmarks, you can add and remove folders.',

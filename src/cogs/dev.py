@@ -7,6 +7,7 @@ class DevTools(commands.Cog, command_attrs=dict(hidden=True)):
     def __init__(self, bot):
         self.bot = bot
 
+
     async def cog_check(self, ctx):
         if await self.bot.is_owner(ctx.author):
             return True
@@ -34,7 +35,6 @@ class DevTools(commands.Cog, command_attrs=dict(hidden=True)):
             await ctx.temp_send(f'```\n{tabulate(values, list(values[0].keys()), tablefmt="psql")}\nSelected {len(values)} row(s) in {round(time.time() - start, 2)}s\n```')
         except Exception as e:
             await ctx.temp_send(f'```\n{e}\n```')
-
 
 def setup(bot):
     bot.add_cog(DevTools(bot))

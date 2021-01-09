@@ -151,7 +151,7 @@ class Bookmarking(commands.Cog):
                                           bookmark_id, ctx.author.id)
                 await ctx.temp_send('Successfully deleted bookmark.')
         else:
-            await ctx.temp_send('Could not find bookmark, are you sure it exists or you own it?')
+            await ctx.temp_send('Could not find bookmark, are you sure it exists, or you own it?')
 
 
 def setup(bot):

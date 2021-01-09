@@ -12,14 +12,12 @@ from src.utils.errors import CurrentlyDevModeError
 class BotBase(commands.AutoShardedBot):
     def __init__(self, **kwargs):
         self.user_blacklist = []
+        self.prefixes = None
         self.token = kwargs.pop('token')
-        self.testers = kwargs.pop('testers')
         self.ignored_cogs = kwargs.pop('ignored_cogs')
         self.is_dev_mode = False
         self.uptime = None
         self.db = None
-        self.cache = None
-        self.commandsSinceLogon = 0
         self.db_user = kwargs.pop('db_user')
         self.db_name = kwargs.pop('db_name')
         self.db_pass = kwargs.pop('db_pass')
@@ -35,9 +33,14 @@ class BotBase(commands.AutoShardedBot):
     async def get_context(self, message, *, cls=None):
         return await super().get_context(message, cls=NewContext)
 
-    async def on_command(self, ctx):
-        if ctx.invoked_with != 'stats':
-            self.commandsSinceLogon += 1
+    async def get_prefix(self, message):
+        if not self.prefixes:
+            return '~'
+        else:
+            try:
+                return self.prefixes[message.author.id]
+            except KeyError:
+                return '~'
 
     def start_bot(self):
         """Starts the bot and logs into discord."""
@@ -66,7 +69,6 @@ class BotBase(commands.AutoShardedBot):
 bot_creds = {
     "token": os.getenv('TOKEN'),
     'ignored_cogs': [],
-    'testers': [],
     'command_prefix': '~',
     'db_user': os.getenv('DB_USER'),
     'db_pass': os.getenv('DB_PASS'),

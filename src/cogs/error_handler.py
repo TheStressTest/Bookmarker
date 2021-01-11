@@ -6,7 +6,7 @@ from src.utils import errors
 from discord.ext import commands
 
 
-class CommandErrorHandler(commands.Cog):
+class CommandErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
 
     def __init__(self, bot):
         self.bot = bot

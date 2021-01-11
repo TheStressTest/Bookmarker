@@ -25,7 +25,6 @@ class DevTools(commands.Cog, command_attrs=dict(hidden=True)):
         else:
             self.bot.is_dev_mode = True
 
-    @commands.is_owner()
     @commands.command(name='sql')
     async def _sql(self, ctx, *, query):
         import time
@@ -35,6 +34,10 @@ class DevTools(commands.Cog, command_attrs=dict(hidden=True)):
             await ctx.temp_send(f'```\n{tabulate(values, list(values[0].keys()), tablefmt="psql")}\nSelected {len(values)} row(s) in {round(time.time() - start, 2)}s\n```')
         except Exception as e:
             await ctx.temp_send(f'```\n{e}\n```')
+
+    @commands.group(name='blacklist')
+    async def _blacklist(self, ctx, user_id: int):
+        pass
 
 def setup(bot):
     bot.add_cog(DevTools(bot))

@@ -2,6 +2,7 @@ import os
 import re
 import asyncpg
 import time
+import json
 
 from discord.ext import commands
 from datetime import datetime
@@ -11,7 +12,6 @@ from src.utils.errors import CurrentlyDevModeError
 
 class BotBase(commands.AutoShardedBot):
     def __init__(self, **kwargs):
-        self.user_blacklist = []
         self.prefixes = None
         self.token = kwargs.pop('token')
         self.ignored_cogs = kwargs.pop('ignored_cogs')
@@ -33,14 +33,17 @@ class BotBase(commands.AutoShardedBot):
     async def get_context(self, message, *, cls=None):
         return await super().get_context(message, cls=NewContext)
 
+    @property
+    async def get_json_config(self):
+        with open('src/static-config.json', 'r') as config_file:
+            config_file = json.load(config_file)
+        return config_file
+
     async def get_prefix(self, message):
-        if not self.prefixes:
+        if not self.prefixes or not self.prefixes[message.author.id]:
             return '~'
         else:
-            try:
-                return self.prefixes[message.author.id]
-            except KeyError:
-                return '~'
+            return self.prefixes[message.author.id]
 
     def start_bot(self):
         """Starts the bot and logs into discord."""
@@ -92,10 +95,11 @@ async def is_dev_mode(ctx):
 
 @client.event
 async def on_message(message):
+    json_config = await client.get_json_config
     """Runs a few checks on every message that is sent."""
     if message.author.id == client.user.id:
         return
-    if message.author.id in client.user_blacklist:
+    if message.author.id in json_config['blacklisted-users'] or message.guild.id in json_config['blacklisted-guilds']:
         return
     if re.fullmatch("<@(!)?790632534350233630>", message.content):
         await message.channel.send(f'Hello! I am {client.user.name}. My prefix is "{client.command_prefix}". Use {client.command_prefix}help to get a list of commands.')

@@ -8,11 +8,16 @@ from discord.ext import commands
 from datetime import datetime
 from src.utils.custom_context import NewContext
 from src.utils.errors import CurrentlyDevModeError
+from src.cogs.meta import DoHelp
+
+with open('src/static-config.json', 'r') as config_file:
+    config_file = json.load(config_file)
 
 
 class BotBase(commands.AutoShardedBot):
     def __init__(self, **kwargs):
         self.prefixes = None
+        self.config = config_file
         self.token = kwargs.pop('token')
         self.ignored_cogs = kwargs.pop('ignored_cogs')
         self.is_dev_mode = False
@@ -23,6 +28,13 @@ class BotBase(commands.AutoShardedBot):
         self.db_pass = kwargs.pop('db_pass')
         super().__init__(**kwargs)
 
+
+    def update_config_file(self, content=None):
+        if not content:
+            content = json.dumps(self.config, indent=4)
+            with open('static-config.json', 'w') as cf:
+                cf.write(content)
+
     def load_cogs(self):
         """Loads all the necessary cogs."""
         for file in os.listdir("./src/cogs"):
@@ -32,12 +44,6 @@ class BotBase(commands.AutoShardedBot):
 
     async def get_context(self, message, *, cls=None):
         return await super().get_context(message, cls=NewContext)
-
-    @property
-    async def get_json_config(self):
-        with open('src/static-config.json', 'r') as config_file:
-            config_file = json.load(config_file)
-        return config_file
 
     async def get_prefix(self, message):
         if not self.prefixes or not self.prefixes[message.author.id]:
@@ -57,6 +63,7 @@ class BotBase(commands.AutoShardedBot):
             print('Could not connect to database.')
             print(e)
         else:
+            self.help_command = DoHelp()
             self.uptime = datetime.utcnow()
             self.load_cogs()
             self.run(self.token)
@@ -95,7 +102,7 @@ async def is_dev_mode(ctx):
 
 @client.event
 async def on_message(message):
-    json_config = await client.get_json_config
+    json_config = client.config
     """Runs a few checks on every message that is sent."""
     if message.author.id == client.user.id:
         return

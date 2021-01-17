@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from tabulate import tabulate
+# from src.utils.fuzzy import extract
 
 
 class DevTools(commands.Cog, command_attrs=dict(hidden=True)):
@@ -24,6 +25,16 @@ class DevTools(commands.Cog, command_attrs=dict(hidden=True)):
             self.bot.is_dev_mode = False
         else:
             self.bot.is_dev_mode = True
+    #
+    # @commands.command(name='similar')
+    # async def _similar(self, ctx, command_name):
+    #     command_names = []
+    #     for command in self.bot.walk_commands():
+    #         command_names.append(command.name)
+    #     await ctx.send('did you mean:')
+    #     commands = extract(query=command_name, choices=command_names, limit=5)
+    #     for command in commands:
+    #         await ctx.send(command[0])
 
     @commands.command(name='sql')
     async def _sql(self, ctx, *, query):
@@ -36,8 +47,16 @@ class DevTools(commands.Cog, command_attrs=dict(hidden=True)):
             await ctx.temp_send(f'```\n{e}\n```')
 
     @commands.group(name='blacklist')
-    async def _blacklist(self, ctx, user_id: int):
+    async def _blacklist(self, ctx):
         pass
+
+    @_blacklist.command(name='guild')
+    async def _guild(self, ctx, guild_id: int):
+        guild = await self.bot.fetch_guild(guild_id)
+        self.bot.config['blacklisted-guilds'].append(guild.id)
+        await ctx.message.add_reaction('\U0001f44d')
+        self.bot.update_config_file()
+
 
 def setup(bot):
     bot.add_cog(DevTools(bot))

@@ -10,9 +10,16 @@ class Setup(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.Cog.listener()
     async def on_ready(self):
         """Leaves blacklisted guilds"""
+        blacklisted_guilds = self.bot.config
         for guild in self.bot.guilds:
-            if guild.id in await self.bot.get_json_config:
+            if guild.id in blacklisted_guilds['blacklisted-guilds']:
                 await guild.leave()
+
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild):
+        blacklisted_guilds = self.bot.config
+        if guild.id in blacklisted_guilds['blacklisted-guilds']:
+            await guild.leave()
 
 
 def setup(bot):

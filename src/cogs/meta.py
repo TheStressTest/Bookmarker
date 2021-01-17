@@ -2,6 +2,11 @@ import discord
 from discord.ext import commands
 
 
+class DoHelp(commands.HelpCommand):
+    async def command_not_found(self, string):
+        print(string)
+
+
 class Meta(commands.Cog, name='Config'):
     def __init__(self, bot):
         self.bot = bot

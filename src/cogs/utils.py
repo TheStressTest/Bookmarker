@@ -5,7 +5,6 @@ import psutil
 import datetime
 import humanize
 import platform
-import sys
 
 from discord.ext import commands
 

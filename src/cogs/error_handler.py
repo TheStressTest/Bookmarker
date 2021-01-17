@@ -31,13 +31,13 @@ class CommandErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
         if isinstance(error, commands.DisabledCommand):
             await ctx.send(f'{ctx.command} has been disabled.')
 
-        elif isinstance(error, commands.NoPrivateMessage):
+        if isinstance(error, commands.NoPrivateMessage):
             try:
                 await ctx.author.send(f'{ctx.command} can not be used in Private Messages.')
             except discord.HTTPException:
                 pass
 
-        elif isinstance(error, errors.CurrentlyDevModeError):
+        if isinstance(error, errors.CurrentlyDevModeError):
             embed = discord.Embed(
                 color=discord.Color(0xdda453),
                 description='Developer mode is currently enabled. Sorry for the inconvenience!',

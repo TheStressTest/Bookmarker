@@ -6,11 +6,6 @@ class InvalidTimeFormat(commands.CheckFailure):
     pass
 
 
-class NotATesterError(commands.CheckFailure):
-    """Gets raised when someone is not in self.bot.testers"""
-    pass
-
-
 class CurrentlyDevModeError(commands.CheckFailure):
     """Gets raised when developer mode is enabled."""
     pass

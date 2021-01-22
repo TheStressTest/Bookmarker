@@ -1,8 +1,8 @@
 import os
 import re
-import asyncpg
 import time
 import json
+import asyncpg
 
 from discord.ext import commands
 from datetime import datetime
@@ -32,7 +32,6 @@ class BotBase(commands.AutoShardedBot):
     def update_config_file(self, content=None):
         if not content:
             content = self.config
-        print(content)
         with open('src/static-config.json', 'w') as cf:
             json.dump(content, cf, indent=4)
 

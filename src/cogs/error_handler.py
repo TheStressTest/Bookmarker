@@ -54,6 +54,8 @@ class CommandErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
 
         else:
             print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
+            with open('src/bot.log', 'a') as f:
+                f.writelines(traceback.format_exception(type(error), error, error.__traceback__))
             traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
             return
 

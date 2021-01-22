@@ -31,9 +31,10 @@ class BotBase(commands.AutoShardedBot):
 
     def update_config_file(self, content=None):
         if not content:
-            content = json.dumps(self.config, indent=4)
-            with open('static-config.json', 'w') as cf:
-                cf.write(content)
+            content = self.config
+        print(content)
+        with open('src/static-config.json', 'w') as cf:
+            json.dump(content, cf, indent=4)
 
     def load_cogs(self):
         """Loads all the necessary cogs."""
@@ -94,7 +95,7 @@ async def on_ready():
 
 @client.check
 async def is_dev_mode(ctx):
-    if client.is_dev_mode and ctx.author.id != client.owner_id:
+    if client.is_dev_mode and ctx.author.id == client.owner_id:
         raise CurrentlyDevModeError
     else:
         return True

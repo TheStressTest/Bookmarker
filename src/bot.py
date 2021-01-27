@@ -73,7 +73,7 @@ class BotBase(commands.AutoShardedBot):
 
 bot_creds = {
     "token": os.getenv('TOKEN'),
-    'ignored_cogs': [],
+    'ignored_cogs': ['error_handler.py'],
     'command_prefix': os.getenv('default_prefix'),
     'postgresql': os.getenv('postgresql')}
 

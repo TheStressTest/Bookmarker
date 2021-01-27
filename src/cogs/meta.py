@@ -9,12 +9,19 @@ class DoHelp(commands.HelpCommand):
         return f'{self.clean_prefix}{command.qualified_name} {command.signature}'
 
     async def send_command_help(self, command):
+        print(command)
         embed = discord.Embed(
             title=self.get_command_signature(command)
         )
         embed.add_field(name='Help', value=command.help, inline=False)
 
         embed.add_field(name='TL;DR', value=command.brief, inline=False)
+
+        if command.aliases:
+            embed.add_field(name='Aliases', value=', '.join(command.aliases), inline=False)
+
+        channel = self.get_destination()
+        await channel.send(embed=embed)
 
 
     async def command_not_found(self, string):
@@ -26,6 +33,7 @@ class DoHelp(commands.HelpCommand):
 
         for command in _commands:
             res += f'\n{command[0]}'
+
         return f'**Command {string} not found.**\nDid you mean...{res}...?'
 
 

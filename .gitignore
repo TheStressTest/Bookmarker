@@ -1,7 +1,7 @@
 __pycache__/
 *.py[cod]
 .idea
-.env
+*.env
 venv/
 *.json
 src/bot.log

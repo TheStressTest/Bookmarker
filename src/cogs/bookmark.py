@@ -1,4 +1,4 @@
-import timeago
+import humanize
 import discord
 import shlex
 import argparse
@@ -72,7 +72,7 @@ class Bookmarking(commands.Cog):
             message_info = await channel.fetch_message(message_id)
 
             if not args.show_id:
-                info = timeago.format(message_info.created_at, datetime.utcnow())
+                info = humanize.naturaltime(datetime.utcnow() - message_info.created_at)
             else:
                 info = bookmark['database_id']
             try:

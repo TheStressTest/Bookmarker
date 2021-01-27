@@ -5,10 +5,12 @@ import json
 import asyncpg
 
 from discord.ext import commands
-from datetime import datetime
+from dotenv import load_dotenv
 from src.utils.custom_context import NewContext
 from src.utils.errors import CurrentlyDevModeError
 from src.cogs.meta import DoHelp
+
+load_dotenv('src/.env')
 
 with open('src/static-config.json', 'r') as config_file:
     config_file = json.load(config_file)
@@ -16,16 +18,13 @@ with open('src/static-config.json', 'r') as config_file:
 
 class BotBase(commands.AutoShardedBot):
     def __init__(self, **kwargs):
-        self.prefixes = None
+        self.prefixes = {}
         self.config = config_file
         self.token = kwargs.pop('token')
         self.ignored_cogs = kwargs.pop('ignored_cogs')
         self.is_dev_mode = False
-        self.uptime = None
+        self.connection_url = kwargs.pop('postgresql')
         self.db = None
-        self.db_user = kwargs.pop('db_user')
-        self.db_name = kwargs.pop('db_name')
-        self.db_pass = kwargs.pop('db_pass')
         super().__init__(**kwargs)
 
 
@@ -46,17 +45,14 @@ class BotBase(commands.AutoShardedBot):
         return await super().get_context(message, cls=NewContext)
 
     async def get_prefix(self, message):
-        if not self.prefixes or not self.prefixes[message.author.id]:
-            return '~'
-        else:
-            return self.prefixes[message.author.id]
+        return self.prefixes.get(message.author.id, os.getenv('default_prefix'))
 
     def start_bot(self):
         """Starts the bot and logs into discord."""
         try:
             print('Connecting to database...')
             start = time.time()
-            db = self.loop.run_until_complete(asyncpg.create_pool(database=self.db_name, user=self.db_user, password=self.db_pass))
+            db = self.loop.run_until_complete(asyncpg.create_pool(self.connection_url))
             print(f'Connected to database. ({round(time.time() - start, 2)})s')
             self.db = db
         except Exception as e:
@@ -64,7 +60,6 @@ class BotBase(commands.AutoShardedBot):
             print(e)
         else:
             self.help_command = DoHelp()
-            self.uptime = datetime.utcnow()
             self.load_cogs()
             self.run(self.token)
 
@@ -80,9 +75,8 @@ bot_creds = {
     "token": os.getenv('TOKEN'),
     'ignored_cogs': [],
     'command_prefix': '~',
-    'db_user': os.getenv('DB_USER'),
-    'db_pass': os.getenv('DB_PASS'),
-    'db_name': os.getenv('DB_NAME')}
+    'postgresql': os.getenv('postgresql')}
+
 
 client = BotBase(**bot_creds, owner_id=701494621162963044)
 
@@ -94,7 +88,7 @@ async def on_ready():
 
 @client.check
 async def is_dev_mode(ctx):
-    if client.is_dev_mode and ctx.author.id == client.owner_id:
+    if client.is_dev_mode and ctx.author.id != client.owner_id:
         raise CurrentlyDevModeError
     else:
         return True

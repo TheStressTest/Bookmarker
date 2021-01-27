@@ -43,11 +43,12 @@ class Utilities(commands.Cog):
 
     @commands.command(name='system', aliases=['sys'], help='Get useful information about the system, including ram, physical memory, process id, uptime & much more.', brief='Get system info.')
     async def _sys(self, ctx):
+        self.process = psutil.Process(os.getpid())
         embed = discord.Embed(
             title='System Information:',
             color=discord.Color(0x2F3136),
         )
-        embed.add_field(name='**System:**', value=f'**Current OS:** `{platform.system()} {platform.architecture()[0]}`\n**Python Version:** `{platform.python_version()}`\n**Uptime:** `{humanize.naturaldelta(self.bot.uptime - datetime.datetime.utcnow())}`\n**Started at:** `{self.bot.uptime}`', inline=False)
+        embed.add_field(name='**System:**', value=f'**Current OS:** `{platform.system()} {platform.architecture()[0]}`\n**Python Version:** `{platform.python_version()}`\n**Uptime:** `{humanize.naturaltime(self.process.create_time() - time.time())}`\n**Started at:** `{datetime.datetime.fromtimestamp(self.process.create_time()).strftime("%a, %b %d, %Y %I:%M:%S")}`', inline=False)
         embed.add_field(name='\n**Memory:**', value=f'**Ram:** `{psutil.virtual_memory().percent}%`\n**PID:** `{os.getpid()}`\n**Physical memory:** `{humanize.naturalsize(self.process.memory_info().rss)}`')
         embed.add_field(name='Specs:', value=f'**Processor:** `{platform.processor()}`\n**Total ram:** `{humanize.naturalsize(psutil.virtual_memory().total)}`\n**CPU Count:** `{psutil.cpu_count()}`', inline=False)
         await ctx.temp_send(embed=embed)

@@ -27,11 +27,9 @@ class Bookmarking(commands.Cog):
                        help='Add a bookmark by copying the ID or link of a message then using ~bookmark <id/link> you will only be able to get the jump url if you are viewing your bookmarks in the same server that you created them in. To avoid this use the flag --global when you create your bookmark.',
                        brief='Create a bookmark with some flags.',
                        flags={
-                           '--hidden': 'Makes your bookmark hidden to view hidden bookmarks run ~bookmarks --show-hidden',
-                           '--global': 'Creates a bookmark that will have a link regardless of what guild you are in.'})
+                           '--hidden': 'Makes your bookmark hidden to view hidden bookmarks run ~bookmarks --show-hidden'})
     async def _add(self, ctx, message: discord.Message, *, args: str = ''):
         parser = Arguments(add_help=False, allow_abbrev=False)
-        parser.add_argument('--global', action='store_true', dest='is_global')
         parser.add_argument('--hidden', action='store_true')
         try:
             args = parser.parse_args(shlex.split(args))
@@ -39,8 +37,8 @@ class Bookmarking(commands.Cog):
             await ctx.send(e)
 
         await self.bot.db.execute(
-            'INSERT INTO bookmarks (bookmark_owner_id, message_id, channel_id, is_global, is_hidden) VALUES ($1, $2, $3, $4, $5)',
-            ctx.author.id, message.id, message.channel.id, args.is_global, args.hidden)
+            'INSERT INTO bookmarks (bookmark_owner_id, message_id, channel_id, is_hidden) VALUES ($1, $2, $3, $4)',
+            ctx.author.id, message.id, message.channel.id, args.hidden)
 
         await ctx.send('Bookmark added!')
 
@@ -80,15 +78,9 @@ class Bookmarking(commands.Cog):
                 info = bookmark['database_id']
             try:
                 if not dm:
-
-                    if bookmark['is_global'] or message_info.guild.id == ctx.guild.id and not bookmark['is_hidden']:
+                    if not bookmark['is_hidden']:
                         paginator.add_line(
                             f'[`{await trim_message(message_info.content)}`]({message_info.jump_url}) • {info}')
-
-                    elif not bookmark['is_hidden']:
-                        paginator.add_line(
-                            f'`{await trim_message(message_info.content)}` • {info}')
-
                 else:
                     paginator.add_line(
                         f'[`{await trim_message(message_info.content)}`]({message_info.jump_url}) • {info}')

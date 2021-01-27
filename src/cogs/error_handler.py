@@ -28,6 +28,10 @@ class CommandErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
         if isinstance(error, ignored):
             return
 
+        if isinstance(error, commands.errors.MessageNotFound):
+            await ctx.send('The message you used was invalid.')
+            return
+
         if isinstance(error, commands.DisabledCommand):
             await ctx.send(f'{ctx.command} has been disabled.')
             return
@@ -40,7 +44,7 @@ class CommandErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
             return
 
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("One or more arguments are required for that command!")
+            await ctx.send('One or more arguments are required for that command!')
             return
 
         if isinstance(error, errors.CurrentlyDevModeError):

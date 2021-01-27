@@ -45,7 +45,7 @@ class BotBase(commands.AutoShardedBot):
         return await super().get_context(message, cls=NewContext)
 
     async def get_prefix(self, message):
-        return self.prefixes.get(message.author.id, os.getenv('default_prefix'))
+        return self.prefixes.get(message.author.id, self.command_prefix)
 
     def start_bot(self):
         """Starts the bot and logs into discord."""
@@ -74,7 +74,7 @@ class BotBase(commands.AutoShardedBot):
 bot_creds = {
     "token": os.getenv('TOKEN'),
     'ignored_cogs': [],
-    'command_prefix': '~',
+    'command_prefix': os.getenv('default_prefix'),
     'postgresql': os.getenv('postgresql')}
 
 
@@ -102,8 +102,8 @@ async def on_message(message):
         return
     if message.author.id in json_config['blacklisted-users'] or message.guild.id in json_config['blacklisted-guilds']:
         return
-    if re.fullmatch("<@(!)?790632534350233630>", message.content):
-        await message.channel.send(f'Hello! I am {client.user.name}. My prefix is "{client.command_prefix}". Use {client.command_prefix}help to get a list of commands.')
+    if re.fullmatch(r"<@(!)?790632534350233630>", message.content):
+        await message.channel.send(f'Hello! I am {client.user.name}. Your prefix is "{client.prefixes.get(message.author.id, client.command_prefix)}". Use {client.prefixes.get(message.author.id, client.command_prefix)}help to get a list of commands.')
     if message.author.bot:
         return
 

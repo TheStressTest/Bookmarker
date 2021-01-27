@@ -1,10 +1,20 @@
 import discord
+
 from discord.ext import commands
+from src.utils.fuzzy import extract
 
 
 class DoHelp(commands.HelpCommand):
     async def command_not_found(self, string):
-        print(string)
+        res = ''
+        command_names = []
+        for command in self.context.bot.walk_commands():
+            command_names.append(command.name)
+        _commands = extract(query=string, choices=command_names, limit=3, score_cutoff=70)
+
+        for command in _commands:
+            res += f'\n{command[0]}'
+        return f'**Command {string} not found.**\nDid you mean...{res}...?'
 
 
 class Meta(commands.Cog, name='Config'):

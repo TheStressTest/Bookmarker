@@ -22,7 +22,7 @@ class CommandErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
             if cog._get_overridden_method(cog.cog_command_error) is not None:
                 return
 
-        ignored = (commands.CommandNotFound, )
+        ignored = ()
         error = getattr(error, 'original', error)
 
         if isinstance(error, ignored):

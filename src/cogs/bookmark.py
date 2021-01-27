@@ -18,13 +18,18 @@ class Bookmarking(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(name='bookmark', invoke_without_command=True,
-                    help='Add a bookmark by copying the ID or link of a message then using ~bookmark <id/link> you will only be able to get the jump url if you are viewing your bookmarks in the same server that you created them in. To avoid this use the flag --global when you create your bookmark.',
-                    brief='Create a bookmark with some flags.',
-                    flags={
-                        '--hidden': 'Makes your bookmark hidden to view hidden bookmarks run ~bookmarks --show-hidden',
-                        '--global': 'Creates a bookmark that will have a link regardless of what guild you are in.'})
-    async def _bookmark(self, ctx, message: discord.Message, *, args: str = ''):
+    @commands.group(name='bookmark',
+                    help='Commands, related to bookmarking messages.')
+    async def _bookmark(self, ctx):
+        pass
+
+    @_bookmark.command(name='add',
+                       help='Add a bookmark by copying the ID or link of a message then using ~bookmark <id/link> you will only be able to get the jump url if you are viewing your bookmarks in the same server that you created them in. To avoid this use the flag --global when you create your bookmark.',
+                       brief='Create a bookmark with some flags.',
+                       flags={
+                           '--hidden': 'Makes your bookmark hidden to view hidden bookmarks run ~bookmarks --show-hidden',
+                           '--global': 'Creates a bookmark that will have a link regardless of what guild you are in.'})
+    async def _add(self, ctx, message: discord.Message, *, args: str = ''):
         parser = Arguments(add_help=False, allow_abbrev=False)
         parser.add_argument('--global', action='store_true', dest='is_global')
         parser.add_argument('--hidden', action='store_true')
@@ -38,8 +43,6 @@ class Bookmarking(commands.Cog):
             ctx.author.id, message.id, message.channel.id, args.is_global, args.hidden)
 
         await ctx.send('Bookmark added!')
-
-
 
     @commands.command(name='bookmarks',
                       brief='View your bookmarks.',
@@ -95,8 +98,6 @@ class Bookmarking(commands.Cog):
 
                 paginator.add_line(f'`Deleted message.`')
 
-
-
         # sends message, TODO add menu
         for page in paginator.pages:
             embed = discord.Embed(
@@ -132,15 +133,12 @@ class Bookmarking(commands.Cog):
                         text='If you would like to view the id\' of the bookmark use the flag --show-id. Some messages may not have links and this is because they were bookmarked in another guild. If you would like to access all of your bookmarks with links run ~bookmarks --show-hidden. If you would like a bookmark to accessible anywhere use the flag --global when creating it.')
                     await message.edit(embed=embed)
 
-
-
-
-
     @_bookmark.command(name='remove', aliases=['del', 'delete'],
                        brief='Remove a bookmark.',
                        help=f'Delete a bookmark using the ID. You can access the ID by reacting to the `ID` reaction when you view your bookmarks.')
     async def _remove_bookmark(self, ctx, bookmark_id: int):
-        if await self.bot.db.fetch('SELECT FROM bookmarks WHERE database_id=$1 AND bookmark_owner_id=$2', bookmark_id, ctx.author.id):
+        if await self.bot.db.fetch('SELECT FROM bookmarks WHERE database_id=$1 AND bookmark_owner_id=$2', bookmark_id,
+                                   ctx.author.id):
             confirm = await ctx.prompt('Are you sure you would like to delete this bookmark?')
 
             if not confirm:

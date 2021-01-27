@@ -24,9 +24,16 @@ class DoHelp(commands.HelpCommand):
 
     async def send_group_help(self, group):
         embed = discord.Embed(
-            title=group,
+            title=group.name,
         )
-        print(group.commands())
+        embed.add_field(name='Help', value=group.help, inline=False)
+
+        embed.add_field(name='TL;DR', value=group.brief, inline=False)
+
+        embed.add_field(name='Commands:', value=', '.join(str(group.walk_commands())), inline=False)
+
+        channel = self.get_destination()
+        await channel.send(embed=embed)
 
     async def command_not_found(self, string):
         res = ''

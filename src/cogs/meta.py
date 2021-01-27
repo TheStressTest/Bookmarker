@@ -9,7 +9,6 @@ class DoHelp(commands.HelpCommand):
         return f'{self.clean_prefix}{command.qualified_name} {command.signature}'
 
     async def send_command_help(self, command):
-        print(command)
         embed = discord.Embed(
             title=self.get_command_signature(command)
         )

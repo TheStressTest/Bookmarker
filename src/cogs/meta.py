@@ -5,6 +5,18 @@ from src.utils.fuzzy import extract
 
 
 class DoHelp(commands.HelpCommand):
+    def get_command_signature(self, command):
+        return f'{self.clean_prefix}{command.qualified_name} {command.signature}'
+
+    async def send_command_help(self, command):
+        embed = discord.Embed(
+            title=self.get_command_signature(command)
+        )
+        embed.add_field(name='Help', value=command.help, inline=False)
+
+        embed.add_field(name='TL;DR', value=command.brief, inline=False)
+
+
     async def command_not_found(self, string):
         res = ''
         command_names = []

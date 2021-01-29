@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 import time
 import json
 import asyncpg
@@ -30,11 +31,11 @@ class BotBase(commands.AutoShardedBot):
         self.db = None
         super().__init__(**config)
 
-    def setup_logging(self):
+    def setup_logging(self, path):
         max_bytes = 32 * 1024 * 1024  # 32 Mb
-        self.logger = logging.getLogger(name='main')
+        self.logger = logging.getLogger(name='discord.bot')
         self.logger.setLevel(logging.INFO)
-        handler = RotatingFileHandler(filename='bot.log', encoding='utf-8', mode='w', maxBytes=max_bytes, backupCount=3)
+        handler = RotatingFileHandler(filename=path, encoding='utf-8', mode='w', maxBytes=max_bytes, backupCount=3)
         _format = logging.Formatter('[%(asctime)s] [%(levelname)s] %(name)s: %(message)s')
         handler.setFormatter(_format)
         self.logger.addHandler(handler)
@@ -50,6 +51,7 @@ class BotBase(commands.AutoShardedBot):
         for file in os.listdir("./src/cogs"):
             if file.endswith(".py") and file not in self.ignored_cogs:
                 self.load_extension(f"cogs.{file[:-3]}")
+                self.logger.info(f'loaded cog: {file}')
         self.load_extension('jishaku')
 
     async def get_context(self, message, *, cls=None):
@@ -67,9 +69,10 @@ class BotBase(commands.AutoShardedBot):
             print(f'Connected to database. ({round(time.time() - start, 2)})s')
             self.db = db
         except Exception as e:
-            print('Could not connect to database.')
-            print(e)
+            print('Could not connect to database. Exiting.', file=sys.stderr)
+            print(e, file=sys.stderr)
         else:
+            self.setup_logging('src/bot.log')
             self.help_command = DoHelp()
             self.load_cogs()
             self.run(self.token)

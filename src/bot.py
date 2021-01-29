@@ -29,6 +29,8 @@ class BotBase(commands.AutoShardedBot):
         self.db = None
         super().__init__(**config)
 
+    def setup_logging(self):
+        pass
 
     def update_config_file(self, content=None):
         if not content:

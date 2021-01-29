@@ -3,6 +3,7 @@ import re
 import time
 import json
 import asyncpg
+import logging
 
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -17,15 +18,16 @@ with open('src/static-config.json', 'r') as config_file:
 
 
 class BotBase(commands.AutoShardedBot):
-    def __init__(self, **kwargs):
+    def __init__(self, **config):
         self.prefixes = {}
+        self.logger = None
         self.config = config_file
-        self.token = kwargs.pop('token')
-        self.ignored_cogs = kwargs.pop('ignored_cogs')
+        self.token = config.get('token')
+        self.ignored_cogs = config.get('ignored_cogs')
         self.is_dev_mode = False
-        self.connection_url = kwargs.pop('postgresql')
+        self.connection_url = config.get('postgresql')
         self.db = None
-        super().__init__(**kwargs)
+        super().__init__(**config)
 
 
     def update_config_file(self, content=None):

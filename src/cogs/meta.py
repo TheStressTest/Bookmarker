@@ -63,12 +63,17 @@ class Meta(commands.Cog, name='Config'):
     # caches prefixes into a dict, makes it easier for me obtain them
     @commands.Cog.listener()
     async def on_ready(self):
-        prefix_dict = {}
-        query = 'SELECT * FROM prefixes'
-        prefixes = await self.bot.db.fetch(query)
-        for prefix in prefixes:
-            prefix_dict[prefix['owner_id']] = prefix['prefix']
-        self.bot.prefixes = prefix_dict
+        self.bot.logger.info('Started to cache prefix.')
+        try:
+            prefix_dict = {}
+            query = 'SELECT * FROM prefixes'
+            prefixes = await self.bot.db.fetch(query)
+            for prefix in prefixes:
+                prefix_dict[prefix['owner_id']] = prefix['prefix']
+            self.bot.prefixes = prefix_dict
+            self.bot.logger.info(f'Cached {len(prefixes)} prefixes.')
+        except Exception as error:
+            self.bot.logger.info(f'Failed to cache prefix. {error}')
 
 
 def setup(bot):

@@ -58,7 +58,7 @@ class DevTools(commands.Cog, command_attrs=dict(hidden=True)):
         self.bot.update_config_file()
 
     @_blacklist.command(name='user')
-    async def _guild(self, ctx, user_id: int):
+    async def _user(self, ctx, user_id: int):
         user = await self.bot.fetch_user(user_id)
         self.bot.config['blacklisted-users'].append(user.id)
         await ctx.message.add_reaction('\U0001f44d')

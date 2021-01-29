@@ -5,6 +5,7 @@ import time
 import json
 import asyncpg
 import logging
+import traceback
 
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -62,17 +63,19 @@ class BotBase(commands.AutoShardedBot):
 
     def start_bot(self):
         """Starts the bot and logs into discord."""
+        self.setup_logging('src/bot.log')
         try:
             print('Connecting to database...')
             start = time.time()
             db = self.loop.run_until_complete(asyncpg.create_pool(self.connection_url))
             print(f'Connected to database. ({round(time.time() - start, 2)})s')
             self.db = db
-        except Exception as e:
-            print('Could not connect to database. Exiting.', file=sys.stderr)
-            print(e, file=sys.stderr)
-        else:
-            self.setup_logging('src/bot.log')
+        except Exception as error:
+            self.logger.error('Unable to connect to database: \n' + ''.join(traceback.format_exception(type(error), error, error.__traceback__)))
+            self.logger.warning('Unable to connect to database. You will not have access to some commands.')
+            print('Could not connect to database.', file=sys.stderr)
+            print(error, file=sys.stderr)
+        finally:
             self.help_command = DoHelp()
             self.load_cogs()
             self.run(self.token)

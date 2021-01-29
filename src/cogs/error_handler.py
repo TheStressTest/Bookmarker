@@ -22,7 +22,7 @@ class CommandErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
             if cog._get_overridden_method(cog.cog_command_error) is not None:
                 return
 
-        ignored = ()
+        ignored = (commands.CommandNotFound, )
         error = getattr(error, 'original', error)
 
         if isinstance(error, ignored):
@@ -57,7 +57,7 @@ class CommandErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
             return
 
         else:
-            self.bot.logger.warning('\n' + ''.join(traceback.format_exception(type(error), error, error.__traceback__)))
+            self.bot.logger.error('\n' + ''.join(traceback.format_exception(type(error), error, error.__traceback__)))
             print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
             traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
             return

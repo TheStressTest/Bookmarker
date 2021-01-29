@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from src.utils.custom_context import NewContext
 from src.utils.errors import CurrentlyDevModeError
 from src.cogs.meta import DoHelp
+from logging.handlers import RotatingFileHandler
 
 load_dotenv('src/.env')
 
@@ -30,7 +31,13 @@ class BotBase(commands.AutoShardedBot):
         super().__init__(**config)
 
     def setup_logging(self):
-        pass
+        max_bytes = 32 * 1024 * 1024  # 32 Mb
+        self.logger = logging.getLogger(name='main')
+        self.logger.setLevel(logging.INFO)
+        handler = RotatingFileHandler(filename='bot.log', encoding='utf-8', mode='w', maxBytes=max_bytes, backupCount=3)
+        _format = logging.Formatter('[%(asctime)s] [%(levelname)s] %(name)s: %(message)s')
+        handler.setFormatter(_format)
+        self.logger.addHandler(handler)
 
     def update_config_file(self, content=None):
         if not content:
@@ -76,7 +83,7 @@ class BotBase(commands.AutoShardedBot):
 
 
 bot_creds = {
-    "token": os.getenv('TOKEN'),
+    'token': os.getenv('TOKEN'),
     'ignored_cogs': [],
     'command_prefix': os.getenv('default_prefix'),
     'postgresql': os.getenv('postgresql')}

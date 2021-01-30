@@ -69,6 +69,7 @@ class BotBase(commands.AutoShardedBot):
             start = time.time()
             db = self.loop.run_until_complete(asyncpg.create_pool(self.connection_url))
             print(f'Connected to database. ({round(time.time() - start, 2)})s')
+            self.logger.info('Connected to database.')
             self.db = db
         except Exception as error:
             self.logger.error('Unable to connect to database: \n' + ''.join(traceback.format_exception(type(error), error, error.__traceback__)))

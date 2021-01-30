@@ -1,4 +1,6 @@
+import sys
 import discord
+import traceback
 
 from discord.ext import commands
 from src.utils.fuzzy import extract
@@ -73,7 +75,8 @@ class Meta(commands.Cog, name='Config'):
             self.bot.prefixes = prefix_dict
             self.bot.logger.info(f'Cached {len(prefixes)} prefixes.')
         except Exception as error:
-            self.bot.logger.info(f'Failed to cache prefix. {error}')
+            self.bot.logger.info(f'Failed to cache prefixes. {error}')
+            traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 
 def setup(bot):

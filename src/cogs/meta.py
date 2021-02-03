@@ -11,6 +11,10 @@ class DoHelp(commands.HelpCommand):
     def get_command_signature(self, command):
         return f'{self.clean_prefix}{command.qualified_name} {command.signature}'
 
+    async def send_bot_help(self, mapping):
+        channel = self.get_destination()
+        await channel.send('Coming soon:tm:, all you need to know is: \nbookmark add <id>,\nbookmarks,\nbookmark remove <id>,\nand bookmark clear')
+
     async def send_command_help(self, command):
         embed = discord.Embed(
             title=self.get_command_signature(command)

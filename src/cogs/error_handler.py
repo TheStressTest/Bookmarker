@@ -43,6 +43,10 @@ class CommandErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
                 pass
             return
 
+        if isinstance(error, commands.CommandOnCooldown):
+            await ctx.send('This command is on cool-down for you.')
+            return
+
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send('One or more arguments are required for that command!')
             return

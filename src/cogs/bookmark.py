@@ -23,6 +23,7 @@ class Bookmarking(commands.Cog):
     async def _bookmark(self, ctx):
         await ctx.send(f'Did you mean: {self.bot.prefixes.get(ctx.author.id, "~")}bookmark add <id>?')
 
+    @commands.cooldown(1, 3, commands.BucketType.user)
     @_bookmark.command(name='add',
                        help='Add a bookmark by copying the ID or link of a message then using ~bookmark <id/link> you will only be able to get the jump url if you are viewing your bookmarks in the same server that you created them in. To avoid this use the flag --global when you create your bookmark.',
                        brief='Create a bookmark with some flags.',

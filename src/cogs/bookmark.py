@@ -19,9 +19,9 @@ class Bookmarking(commands.Cog):
         self.bot = bot
 
     @commands.group(name='bookmark',
-                    help='Commands, related to bookmarking messages.')
+                    help='Commands, related to bookmarking messages.', invoke_without_command=True)
     async def _bookmark(self, ctx):
-        pass
+        await ctx.send(f'Did you mean: {self.bot.prefixes.get(ctx.author.id, "~")}bookmark add <id>?')
 
     @_bookmark.command(name='add',
                        help='Add a bookmark by copying the ID or link of a message then using ~bookmark <id/link> you will only be able to get the jump url if you are viewing your bookmarks in the same server that you created them in. To avoid this use the flag --global when you create your bookmark.',
@@ -122,10 +122,10 @@ class Bookmarking(commands.Cog):
                     embed.set_footer(text='Expired!')
                 else:
                     embed.set_footer(
-                        text='If you would like to view the id\' of the bookmark use the flag --show-id. Some messages may not have links and this is because they were bookmarked in another guild. If you would like to access all of your bookmarks with links run ~bookmarks --show-hidden. If you would like a bookmark to accessible anywhere use the flag --global when creating it.')
+                        text='Use flag --show-id to see the bookmark ID\'s. Use flag --show-hidden to get a list of all your bookmarks hidden or not dm\'d to you.')
                     await message.edit(embed=embed)
 
-    @_bookmark.command(name='remove', aliases=['del', 'delete'],
+    @_bookmark.command(name='remove', aliases=['del', 'delete', 'rem'],
                        brief='Remove a bookmark.',
                        help=f'Delete a bookmark using the ID. You can access the ID by reacting to the `ID` reaction when you view your bookmarks.')
     async def _remove_bookmark(self, ctx, bookmark_id: int):
@@ -141,6 +141,18 @@ class Bookmarking(commands.Cog):
                 await ctx.temp_send('Successfully deleted bookmark.')
         else:
             await ctx.temp_send('Could not find bookmark, are you sure it exists, or you own it?')
+
+    @_bookmark.command(name='clear',
+                       brief='Clear all of your bookmarks',
+                       help='Clear all of your bookmarks, be careful though, there is no undo.')
+    async def _clear(self, ctx):
+        confirm = await ctx.prompt('You are about to delete all of your bookmark! are you sure you would like to perform this action?')
+        if not confirm:
+            await ctx.send('Aborting.')
+            return
+        else:
+            await self.bot.db.execute('DELETE FROM bookmarks WHERE bookmark_owner_id=$1', ctx.author.id)
+            await ctx.send('Cleared bookmarks.')
 
 
 def setup(bot):

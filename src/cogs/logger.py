@@ -17,19 +17,19 @@ class Logging(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.Cog.listener()
     async def on_command(self, ctx):
-        self.bot.logger.info(f'Command: "{ctx.message.content}" executed in {ctx.guild.name} ({ctx.guild.id}) by {ctx.author.id}')
+        self.bot.loop.run_in_executor(None, self.bot.logger.info, f'Command: "{ctx.message.content}" executed in {ctx.guild.name} ({ctx.guild.id}) by {ctx.author.id}')
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
-        self.bot.logger.info(f'Joined guild: {guild.name} ({guild.id})')
+        self.bot.loop.run_in_executor(None, self.bot.logger.info, f'Joined guild: {guild.name} ({guild.id})')
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
-        self.bot.logger.info(f'Left guild: {guild.name} ({guild.id})')
+        self.bot.loop.run_in_executor(None, self.bot.logger.info, f'Left guild: {guild.name} ({guild.id})')
 
     @commands.Cog.listener()
     async def on_shard_connect(self, shard):
-        self.bot.logger.info(f'Shard connected: {shard}')
+        self.bot.loop.run_in_executor(None, self.bot.logger.info, f'Shard connected: {shard}')
 
     @commands.is_owner()
     @commands.command(name='del-logs')

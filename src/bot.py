@@ -88,7 +88,6 @@ class BotBase(commands.AutoShardedBot):
         return round((time.time() - start) * 1000, 2)
 
 
-
 bot_creds = {
     'token': os.getenv('TOKEN'),
     'ignored_cogs': [],

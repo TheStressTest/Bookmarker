@@ -7,6 +7,7 @@ from src.utils.fuzzy import extract
 
 
 class DoHelp(commands.HelpCommand):
+    # TODO finish help command
     def get_command_signature(self, command):
         return f'{self.clean_prefix}{command.qualified_name} {command.signature}'
 

@@ -8,7 +8,6 @@ class DevTools(commands.Cog, command_attrs=dict(hidden=True)):
     def __init__(self, bot):
         self.bot = bot
 
-
     async def cog_check(self, ctx):
         if await self.bot.is_owner(ctx.author):
             return True
@@ -25,16 +24,6 @@ class DevTools(commands.Cog, command_attrs=dict(hidden=True)):
             self.bot.is_dev_mode = False
         else:
             self.bot.is_dev_mode = True
-    #
-    # @commands.command(name='similar')
-    # async def _similar(self, ctx, command_name):
-    #     command_names = []
-    #     for command in self.bot.walk_commands():
-    #         command_names.append(command.name)
-    #     await ctx.send('did you mean:')
-    #     commands = extract(query=command_name, choices=command_names, limit=5)
-    #     for command in commands:
-    #         await ctx.send(command[0])
 
     @commands.command(name='sql')
     async def _sql(self, ctx, *, query):

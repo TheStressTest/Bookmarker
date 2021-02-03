@@ -33,11 +33,12 @@ class BotBase(commands.AutoShardedBot):
         super().__init__(**config)
 
     def setup_logging(self, path):
+        time_format = '%Y-%m-%d %H:%M:%S'
         max_bytes = 32 * 1024 * 1024  # 32 Mb
         self.logger = logging.getLogger(name='discord.bot')
         self.logger.setLevel(logging.INFO)
         handler = RotatingFileHandler(filename=path, encoding='utf-8', mode='w', maxBytes=max_bytes, backupCount=3)
-        _format = logging.Formatter('[%(asctime)s] [%(levelname)s] %(name)s: %(message)s')
+        _format = logging.Formatter('[%(asctime)s] [%(levelname)s] %(name)s: %(message)s', datefmt=time_format)
         handler.setFormatter(_format)
         self.logger.addHandler(handler)
 

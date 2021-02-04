@@ -1,7 +1,6 @@
 import asyncio
 from discord.ext import commands
 from src.utils.custom_funcs import time_convert as convert_time
-import humanize
 
 
 class Reminders(commands.Cog):

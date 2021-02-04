@@ -1,6 +1,7 @@
 import asyncio
 from discord.ext import commands
 from src.utils.custom_funcs import time_convert as convert_time
+import humanize
 
 
 class Reminders(commands.Cog):
@@ -14,6 +15,8 @@ class Reminders(commands.Cog):
         """"~remind <time> [reason]"""
         converted_time = await convert_time(time)
         if converted_time <= 86400:
+            await ctx.message.add_reaction('👍')
+            await ctx.send('Alright! Ill remind you then.')
             await asyncio.sleep(converted_time)
             await ctx.clean_send(f'Done! You have been reminded for {reason} {ctx.author.mention}')
         else:

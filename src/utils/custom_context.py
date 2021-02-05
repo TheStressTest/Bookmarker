@@ -73,9 +73,16 @@ class NewContext(commands.Context):
             await message.delete()
 
     async def delete_bookmark(self, _id):
-        await self.bot.db.execute('DELETE FROM bookmarks WHERE database_id=$1', _id)
+        pool = self.bot.db
+        await pool.execute('DELETE FROM bookmarks WHERE database_id=$1', _id)
 
     async def bookmark(self, message, args, cache=True):
-        await self.bot.db.execute(
-            'INSERT INTO bookmarks (bookmark_owner_id, message_id, channel_id, is_hidden) VALUES ($1, $2, $3, $4)',
-            self.author.id, message.id, message.channel.id, args.hidden)
+        pool = self.bot.db
+        query = 'INSERT INTO bookmarks (bookmark_owner_id, message_id, channel_id, is_hidden) VALUES ($1, $2, $3, $4)'
+        await pool.execute(query, self.author.id, message.id, message.channel.id, args.hidden)
+
+        if cache:
+            _id = await pool.fetch('SELECT database_id FROM bookmarks WHERE message_id=$1 AND channel_id=$2 AND bookmark_owner_id=$3', message.id, message.channel.id, self.author.id)
+            print(_id)
+            # query = 'INSERT INTO semi_cached_bookmarks (content, jump_url, database_id) VALUES ($1, $2, $3)'
+            # await pool.execute(query, message.content, message.jump_url, _id)

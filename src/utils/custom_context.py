@@ -71,3 +71,11 @@ class NewContext(commands.Context):
             await message.delete()
         else:
             await message.delete()
+
+    async def delete_bookmark(self, _id):
+        await self.bot.db.execute('DELETE FROM bookmarks WHERE database_id=$1', _id)
+
+    async def bookmark(self, message, args, cache=True):
+        await self.bot.db.execute(
+            'INSERT INTO bookmarks (bookmark_owner_id, message_id, channel_id, is_hidden) VALUES ($1, $2, $3, $4)',
+            self.author.id, message.id, message.channel.id, args.hidden)

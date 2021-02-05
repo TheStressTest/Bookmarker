@@ -27,7 +27,7 @@ class BotBase(commands.AutoShardedBot):
         self.config = config_file
         self.token = config.get('token')
         self.ignored_cogs = config.get('ignored_cogs')
-        self.is_dev_mode = False
+        self.is_dev_mode = os.getenv('dev-mode') == 'true'
         self.connection_url = config.get('postgresql')
         self.db = None
         super().__init__(**config)

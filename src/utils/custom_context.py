@@ -2,6 +2,7 @@ from discord.ext import commands
 import discord
 import contextlib
 import asyncio
+import asyncpg  # to except errors
 
 
 class NewContext(commands.Context):
@@ -75,14 +76,21 @@ class NewContext(commands.Context):
     async def delete_bookmark(self, _id):
         pool = self.bot.db
         await pool.execute('DELETE FROM bookmarks WHERE database_id=$1', _id)
+        await pool.execute('DELETE FROM semi_cached_bookmarks WHERE database_id=$1', _id)
 
     async def bookmark(self, message, args, cache=True):
         pool = self.bot.db
         query = 'INSERT INTO bookmarks (bookmark_owner_id, message_id, channel_id, is_hidden) VALUES ($1, $2, $3, $4)'
-        await pool.execute(query, self.author.id, message.id, message.channel.id, args.hidden)
+        try:
+            await pool.execute(query, self.author.id, message.id, message.channel.id, args.hidden)
+            await self.send('Bookmark added!')
+            if cache:
+                _id = await pool.fetchrow(
+                    'SELECT database_id FROM bookmarks WHERE message_id=$1 AND channel_id=$2 AND bookmark_owner_id=$3',
+                    message.id, message.channel.id, self.author.id)
+                query = 'INSERT INTO semi_cached_bookmarks (content, jump_url, database_id) VALUES ($1, $2, $3)'
+                await pool.execute(query, message.content, message.jump_url, _id['database_id'])
 
-        if cache:
-            _id = await pool.fetch('SELECT database_id FROM bookmarks WHERE message_id=$1 AND channel_id=$2 AND bookmark_owner_id=$3', message.id, message.channel.id, self.author.id)
-            print(_id)
-            # query = 'INSERT INTO semi_cached_bookmarks (content, jump_url, database_id) VALUES ($1, $2, $3)'
-            # await pool.execute(query, message.content, message.jump_url, _id)
+        except asyncpg.UniqueViolationError:
+            await self.send('You can\'t bookmark the same message twice.')
+            return False

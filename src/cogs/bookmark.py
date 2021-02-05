@@ -39,8 +39,6 @@ class Bookmarking(commands.Cog):
 
         await ctx.bookmark(message, args)
 
-        await ctx.send('Bookmark added!')
-
     @commands.command(name='bookmarks',
                       brief='View your bookmarks.',
                       help='Use ~bookmarks to view all your bookmarks, you can add and remove folders.',

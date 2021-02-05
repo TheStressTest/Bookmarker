@@ -9,9 +9,9 @@ import traceback
 
 from discord.ext import commands
 from dotenv import load_dotenv
-from src.utils.custom_context import NewContext
-from src.utils.errors import CurrentlyDevModeError
-from src.cogs.meta import DoHelp
+from utils.custom_context import NewContext
+from utils.errors import CurrentlyDevModeError
+from cogs.meta import DoHelp
 from logging.handlers import RotatingFileHandler
 
 load_dotenv('src/.env')

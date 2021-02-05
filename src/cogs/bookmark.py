@@ -49,6 +49,7 @@ class Bookmarking(commands.Cog):
                       flags={'--show-hidden': 'Displays private flags (No arguments required.)',
                              '--show-id': 'Shows the id\'s of the bookmark.}'})
     async def _bookmarks(self, ctx, *, args: str = ''):
+        print('picked up command')
         dm = False
 
         # arg parse stuff
@@ -59,13 +60,14 @@ class Bookmarking(commands.Cog):
             args = parser.parse_args(shlex.split(args))
         except Exception as e:
             await ctx.send(e)
-
+        print('parsed args')
         if args.hidden:
             dm = True
         paginator = commands.Paginator(prefix='', suffix='')
         bookmarks = await self.bot.db.fetch('SELECT * from bookmarks WHERE bookmark_owner_id = $1',
                                             ctx.author.id)
         paginator.add_line(f'Total Bookmarks: {len(bookmarks)}\n')
+        print('made query')
         for bookmark in bookmarks:
 
             # configures message
@@ -74,23 +76,26 @@ class Bookmarking(commands.Cog):
             message_info = await channel.fetch_message(message_id)
 
             if not args.show_id:
-                info = humanize.naturaltime(datetime.utcnow() - message_info.created_at)
+                print('creating info')
+                info = await self.bot.loop.run_in_executor(None, humanize.naturaltime, datetime.utcnow() - message_info.created_at)
             else:
                 info = bookmark['database_id']
             try:
                 if not dm:
+                    print('started if statement')
                     if not bookmark['is_hidden']:
                         paginator.add_line(
                             f'[`{await trim_message(message_info.content)}`]({message_info.jump_url}) • {info}')
+                        print('added line')
                 else:
                     paginator.add_line(
                         f'[`{await trim_message(message_info.content)}`]({message_info.jump_url}) • {info}')
-
+                print('did one loop')
             except (AttributeError, discord.NotFound):
                 await self.bot.db.execute('DELETE FROM bookmarks WHERE message_id = $1', message_id)
 
                 paginator.add_line(f'`Deleted message.`')
-
+        print('sending message')
         # sends message, TODO add menu
         for page in paginator.pages:
             embed = discord.Embed(
@@ -125,6 +130,7 @@ class Bookmarking(commands.Cog):
                     embed.set_footer(
                         text='Use flag --show-id to see the bookmark ID\'s. Use flag --show-hidden to get a list of all your bookmarks hidden or not dm\'d to you.')
                     await message.edit(embed=embed)
+                print('done')
 
     @_bookmark.command(name='remove', aliases=['del', 'delete', 'rem'],
                        brief='Remove a bookmark.',

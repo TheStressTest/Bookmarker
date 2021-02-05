@@ -3,10 +3,11 @@ from src.utils.errors import InvalidTimeFormat
 
 async def trim_message(message, length: int = 12):
     """Trims a message and adds ... at the end"""
+    nl = '\n'
     if len(message) <= length:
         return message
     else:
-        return f'{message[:length]}...'
+        return f'{message[:length].replace(nl, " ")}...'
 
 
 async def time_convert(time):

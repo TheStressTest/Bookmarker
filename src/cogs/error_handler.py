@@ -1,6 +1,7 @@
 import discord
 import traceback
 import sys
+import aiohttp
 
 from src.utils import errors
 from discord.ext import commands
@@ -28,10 +29,10 @@ class CommandErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
         if isinstance(error, ignored):
             return
         elif isinstance(error, commands.errors.MessageNotFound):
-            await ctx.send('The message you used was invalid.')
+            await ctx.error('The message you used was invalid.', error)
 
         elif isinstance(error, commands.DisabledCommand):
-            await ctx.send(f'{ctx.command} has been disabled.')
+            await ctx.error(f'{ctx.command} has been disabled.', error)
 
         elif isinstance(error, commands.NoPrivateMessage):
             try:
@@ -40,15 +41,28 @@ class CommandErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
                 pass
 
         elif isinstance(error, commands.CommandOnCooldown):
-            await ctx.send('This command is on cool-down for you.')
+            await ctx.error('This command is on cooldown for you.', error)
 
         elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send('One or more arguments are required for that command!')
+            await ctx.error(error, error)
 
         else:
             self.bot.logger.error('\n' + ''.join(traceback.format_exception(type(error), error, error.__traceback__)))
             print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
-            traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
+            tb = traceback.format_exception(type(error), error, error.__traceback__)
+            print(''.join(tb), file=sys.stderr)
+            if self.bot.webhook_url:
+                async with aiohttp.ClientSession() as session:
+                    embed = discord.Embed(
+                        title='Ignoring exception in command {}:'.format(ctx.command),
+                        description=f"""
+                        ```py
+                        {''.join(tb)}```
+                        """,
+                        color=discord.Color.red()
+                    )
+                    webhook = discord.Webhook.from_url(self.bot.webhook_url, adapter=discord.AsyncWebhookAdapter(session))
+                    await webhook.send(username='Bookmarker errors.', embed=embed)
             return
 
 

@@ -2,6 +2,7 @@ from discord.ext import commands
 import discord
 import contextlib
 import asyncio
+import traceback
 import asyncpg  # to except errors
 
 
@@ -18,6 +19,34 @@ class NewContext(commands.Context):
         """Strips out @everyone and @here from the message."""
         zero_space = "​"
         await self.send(content.replace("@everyone", f"@{zero_space}everyone").replace("@here", f"@{zero_space}here"), **kwargs)
+
+    async def error(self, title, error, show_full_tb=True, **kwargs):
+        """Sends a message formatted as an error"""
+        error_link = 'https://cdn.discordapp.com/attachments/796817574787547137/807450268269936690/error.png'
+        author_id = kwargs.get('author_id', self.author.id)
+
+        embed = discord.Embed(
+            color=discord.Color.red()
+        )
+        embed.set_author(name=f'{title}', icon_url=error_link)
+        message = await self.send(embed=embed, **kwargs)
+        if show_full_tb:
+            def check(payload):
+                if payload.message_id != message.id or payload.user_id != author_id:
+                    return False
+                else:
+                    return True
+
+            await message.add_reaction('<:error:807445634202075146>')
+
+            try:
+                await self.bot.wait_for('raw_reaction_add', check=check, timeout=120)
+            except asyncio.TimeoutError:
+                embed.set_footer(text='Error pane has expired')
+            else:
+                embed.description = f"""```py
+                {''.join(traceback.format_exception(type(error), error, error.__traceback__))}```"""
+                await message.edit(embed=embed)
 
     async def prompt(self, text: str, timeout=60.0, delete_after=True):
         """Adds a prompt, (yes or no)"""

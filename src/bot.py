@@ -30,6 +30,7 @@ class BotBase(commands.AutoShardedBot):
         self.is_dev_mode = os.getenv('dev-mode') == 'true'
         self.connection_url = config.get('postgresql')
         self.db = None
+        self.webhook_url = config.get('webhook_url', None)
         super().__init__(**config)
 
     def setup_logging(self, path):
@@ -93,7 +94,8 @@ bot_creds = {
     'token': os.getenv('TOKEN'),
     'ignored_cogs': [],
     'command_prefix': os.getenv('default_prefix'),
-    'postgresql': os.getenv('postgresql')}
+    'postgresql': os.getenv('postgresql'),
+    'webhook_url': os.getenv('webhook-url')}
 
 
 client = BotBase(**bot_creds, owner_id=701494621162963044)

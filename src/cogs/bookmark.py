@@ -63,25 +63,19 @@ class Bookmarking(commands.Cog):
         paginator.add_line(f'Total Bookmarks: {len(bookmarks)}\n')
         for bookmark in bookmarks:
 
-            # configures message
-            # channel = self.bot.get_channel(bookmark['channel_id'])
-            # message_id = bookmark['message_id']
-            # message_info = await channel.fetch_message(message_id)
             message_info = await ctx.bookmark_from_cache(bookmark['database_id'])
             if not args.show_id:
                 info = await self.bot.loop.run_in_executor(None, humanize.naturaltime, datetime.utcnow() - message_info['created_at'])
             else:
                 info = bookmark['database_id']
-            try:
-                if not dm:
-                    if not bookmark['is_hidden']:
-                        paginator.add_line(
-                            f'[`{await trim_message(message_info["content"])}`]({message_info["jump_url"]}) • {info}')
-                else:
+
+            if not dm:
+                if not bookmark['is_hidden']:
                     paginator.add_line(
                         f'[`{await trim_message(message_info["content"])}`]({message_info["jump_url"]}) • {info}')
-            except (AttributeError, discord.NotFound):
-                await self.bot.db.execute('DELETE FROM bookmarks WHERE message_id = $1', bookmark['message_id'])
+            else:
+                paginator.add_line(
+                    f'[`{await trim_message(message_info["content"])}`]({message_info["jump_url"]}) • {info}')
 
                 paginator.add_line(f'`Deleted message.`')
         # sends message, TODO add menu

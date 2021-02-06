@@ -6,11 +6,11 @@ import json
 import asyncpg
 import logging
 import traceback
+import discord
 
 from discord.ext import commands
 from dotenv import load_dotenv
 from utils.custom_context import NewContext
-from utils.errors import CurrentlyDevModeError
 from cogs.meta import DoHelp
 from logging.handlers import RotatingFileHandler
 
@@ -107,9 +107,13 @@ async def on_ready():
 @client.check
 async def is_dev_mode(ctx):
     if client.is_dev_mode and ctx.author.id != client.owner_id:
-        raise CurrentlyDevModeError
-    else:
-        return True
+        embed = discord.Embed(
+            color=discord.Color(0xdda453),
+            description='Developer mode is currently enabled. Sorry for the inconvenience!',
+        )
+        embed.set_author(name='⚠ | Developer mode enabled!')
+        await ctx.temp_send(embed=embed)
+    return True
 
 
 @client.event

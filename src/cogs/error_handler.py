@@ -27,38 +27,23 @@ class CommandErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
 
         if isinstance(error, ignored):
             return
-
-        if isinstance(error, commands.errors.MessageNotFound):
+        elif isinstance(error, commands.errors.MessageNotFound):
             await ctx.send('The message you used was invalid.')
-            return
 
-        if isinstance(error, commands.DisabledCommand):
+        elif isinstance(error, commands.DisabledCommand):
             await ctx.send(f'{ctx.command} has been disabled.')
-            return
 
-        if isinstance(error, commands.NoPrivateMessage):
+        elif isinstance(error, commands.NoPrivateMessage):
             try:
                 await ctx.author.send(f'{ctx.command} can not be used in Private Messages.')
             except discord.HTTPException:
                 pass
-            return
 
-        if isinstance(error, commands.CommandOnCooldown):
+        elif isinstance(error, commands.CommandOnCooldown):
             await ctx.send('This command is on cool-down for you.')
-            return
 
-        if isinstance(error, commands.MissingRequiredArgument):
+        elif isinstance(error, commands.MissingRequiredArgument):
             await ctx.send('One or more arguments are required for that command!')
-            return
-
-        if isinstance(error, errors.CurrentlyDevModeError):
-            embed = discord.Embed(
-                color=discord.Color(0xdda453),
-                description='Developer mode is currently enabled. Sorry for the inconvenience!',
-            )
-            embed.set_author(name='⚠ | Developer mode enabled!')
-            await ctx.temp_send(embed=embed)
-            return
 
         else:
             self.bot.logger.error('\n' + ''.join(traceback.format_exception(type(error), error, error.__traceback__)))

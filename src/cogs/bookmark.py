@@ -64,24 +64,24 @@ class Bookmarking(commands.Cog):
         for bookmark in bookmarks:
 
             # configures message
-            channel = self.bot.get_channel(bookmark['channel_id'])
-            message_id = bookmark['message_id']
-            message_info = await channel.fetch_message(message_id)
-
+            # channel = self.bot.get_channel(bookmark['channel_id'])
+            # message_id = bookmark['message_id']
+            # message_info = await channel.fetch_message(message_id)
+            message_info = await ctx.bookmark_from_cache(bookmark['database_id'])
             if not args.show_id:
-                info = await self.bot.loop.run_in_executor(None, humanize.naturaltime, datetime.utcnow() - message_info.created_at)
+                info = await self.bot.loop.run_in_executor(None, humanize.naturaltime, datetime.utcnow() - message_info['created_at'])
             else:
                 info = bookmark['database_id']
             try:
                 if not dm:
                     if not bookmark['is_hidden']:
                         paginator.add_line(
-                            f'[`{await trim_message(message_info.content)}`]({message_info.jump_url}) • {info}')
+                            f'[`{await trim_message(message_info["content"])}`]({message_info["jump_url"]}) • {info}')
                 else:
                     paginator.add_line(
-                        f'[`{await trim_message(message_info.content)}`]({message_info.jump_url}) • {info}')
+                        f'[`{await trim_message(message_info["content"])}`]({message_info["jump_url"]}) • {info}')
             except (AttributeError, discord.NotFound):
-                await self.bot.db.execute('DELETE FROM bookmarks WHERE message_id = $1', message_id)
+                await self.bot.db.execute('DELETE FROM bookmarks WHERE message_id = $1', bookmark['message_id'])
 
                 paginator.add_line(f'`Deleted message.`')
         # sends message, TODO add menu
@@ -118,7 +118,6 @@ class Bookmarking(commands.Cog):
                     embed.set_footer(
                         text='Use flag --show-id to see the bookmark ID\'s. Use flag --show-hidden to get a list of all your bookmarks hidden or not dm\'d to you.')
                     await message.edit(embed=embed)
-                print('done')
 
     @_bookmark.command(name='remove', aliases=['del', 'delete', 'rem'],
                        brief='Remove a bookmark.',

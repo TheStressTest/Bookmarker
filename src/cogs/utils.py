@@ -55,7 +55,7 @@ class Utilities(commands.Cog):
 
     @commands.command(name='invite', brief='Invite me to your server.', help='Invite me to your server, optional argument: permission integer. If you want to invite me to your server with different permissions use this.')
     async def _invite(self, ctx, perm_int: int = 117824):
-        await ctx.send(f'Thanks for inviting me!\nhttps://discord.com/api/oauth2/authorize?client_id=790632534350233630&permissions={perm_int}&scope=bot')
+        await ctx.send(f'Thanks for inviting me!\n<https://discord.com/api/oauth2/authorize?client_id=790632534350233630&permissions={perm_int}&scope=bot>')
 
     @_invite.error
     async def _handle(self, ctx, error):

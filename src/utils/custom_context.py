@@ -88,9 +88,14 @@ class NewContext(commands.Context):
                 _id = await pool.fetchrow(
                     'SELECT database_id FROM bookmarks WHERE message_id=$1 AND channel_id=$2 AND bookmark_owner_id=$3',
                     message.id, message.channel.id, self.author.id)
-                query = 'INSERT INTO semi_cached_bookmarks (content, jump_url, database_id) VALUES ($1, $2, $3)'
-                await pool.execute(query, message.content, message.jump_url, _id['database_id'])
+                query = 'INSERT INTO semi_cached_bookmarks (content, jump_url, created_at, database_id) VALUES ($1, $2, $3, $4)'
+                await pool.execute(query, message.content, message.jump_url, message.created_at, _id['database_id'])
 
         except asyncpg.UniqueViolationError:
             await self.send('You can\'t bookmark the same message twice.')
-            return False
+
+    async def bookmark_from_cache(self, _id):
+        pool = self.bot.db
+        query = 'SELECT * FROM semi_cached_bookmarks WHERE database_id=$1'
+        bookmark = await pool.fetchrow(query, _id)
+        return bookmark

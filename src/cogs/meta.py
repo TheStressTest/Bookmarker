@@ -63,6 +63,9 @@ class DoHelp(commands.HelpCommand):
         channel = self.get_destination()
         await channel.send(embed=embed)
 
+    async def send_cog_help(self, cog):
+        pass
+
     async def command_not_found(self, string):
         res = ''
         command_names = []

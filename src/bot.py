@@ -30,6 +30,7 @@ class BotBase(commands.AutoShardedBot):
         self.is_dev_mode = os.getenv('dev-mode') == 'true'
         self.connection_url = config.get('postgresql')
         self.db = None
+        self.embed_color = config.get('embed_color', 0x2F3136)
         self.webhook_url = config.get('webhook_url', None)
         super().__init__(**config)
 

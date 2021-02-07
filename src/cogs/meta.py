@@ -12,12 +12,29 @@ class DoHelp(commands.HelpCommand):
         return f'{self.clean_prefix}{command.qualified_name} {command.signature}'
 
     async def send_bot_help(self, mapping):
+        embed = discord.Embed(
+            title='Bookmarker help menu.',
+            color=self.context.bot.embed_color
+        )
+        for cog, command in mapping.items():
+            command_names = []
+            if not cog:
+                continue
+            _commands = cog.get_commands()
+            for _command in _commands:
+                if not _command.hidden:
+                    command_names.append(_command.qualified_name)
+
+            if command_names:
+                embed.add_field(name=cog.qualified_name, value=f'`{", ".join(command_names)}`')
+
         channel = self.get_destination()
-        await channel.send('Coming soon:tm:, all you need to know is: \nbookmark add <id>,\nbookmarks,\nbookmark remove <id>,\nand bookmark clear')
+        await channel.send(embed=embed)
 
     async def send_command_help(self, command):
         embed = discord.Embed(
-            title=self.get_command_signature(command)
+            title=self.get_command_signature(command),
+            color=self.context.bot.embed_color
         )
         embed.add_field(name='Help', value=command.help, inline=False)
 
@@ -31,9 +48,9 @@ class DoHelp(commands.HelpCommand):
         await channel.send(embed=embed)
 
     async def send_group_help(self, group):
-
         embed = discord.Embed(
             title=group.name,
+            color=self.context.bot.embed_color
         )
         embed.add_field(name='Help', value=group.help, inline=False)
 

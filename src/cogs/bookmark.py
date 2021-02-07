@@ -104,7 +104,7 @@ class Bookmarking(commands.Cog):
         for page in paginator.pages:
             embed = discord.Embed(
                 description=page,
-                color=discord.Color(0x2F3136)
+                color=ctx.bot.embed_color
             )
             embed.set_author(name='Your bookmarks:')
             if not dm: embed.set_footer(text='React with \U00002139 to get some useful info.')

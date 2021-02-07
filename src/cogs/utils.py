@@ -23,7 +23,7 @@ class Utilities(commands.Cog):
         embed = discord.Embed(
             title='Latency:',
             description=desc_embed,
-            color=discord.Color(0x2F3136)
+            color=ctx.bot.embed_color
         )
         start = time.time()
         message = await ctx.send(embed=embed)
@@ -31,7 +31,7 @@ class Utilities(commands.Cog):
         embed = discord.Embed(
             title='Latency:',
             description=desc_embed,
-            color=discord.Color(0x2F3136)
+            color=ctx.bot.embed_color
         )
         await message.edit(embed=embed)
 
@@ -46,7 +46,7 @@ class Utilities(commands.Cog):
         self.process = psutil.Process(os.getpid())
         embed = discord.Embed(
             title='System Information:',
-            color=discord.Color(0x2F3136),
+            color=ctx.bot.embed_color,
         )
         embed.add_field(name='**System:**', value=f'**Current OS:** `{platform.system()} {platform.architecture()[0]}`\n**Python Version:** `{platform.python_version()}`\n**Uptime:** `{humanize.naturaldelta(self.process.create_time() - time.time())}`\n**Started at:** `{datetime.datetime.fromtimestamp(self.process.create_time()).strftime("%a, %b %d, %Y %I:%M:%S")}`', inline=False)
         embed.add_field(name='\n**Memory:**', value=f'**Ram:** `{psutil.virtual_memory().percent}%`\n**PID:** `{os.getpid()}`\n**Physical memory:** `{humanize.naturalsize(self.process.memory_info().rss)}`')

@@ -19,7 +19,7 @@ class Bookmarking(commands.Cog):
         self.bot = bot
 
     @commands.group(name='bookmark',
-                    help='Commands, related to bookmarking messages.', invoke_without_command=True)
+                    help='Commands related to bookmarking messages.', invoke_without_command=True)
     async def _bookmark(self, ctx):
         await ctx.send(f'Did you mean: {self.bot.prefixes.get(ctx.author.id, "~")}bookmark add <id>?')
 

@@ -61,6 +61,7 @@ class CommandErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
 
             print(''.join(tb), file=sys.stderr)
 
+            # errors get sent to webhook
             if self.bot.webhook_url:
                 async with aiohttp.ClientSession() as session:
                     embed = discord.Embed(

@@ -26,7 +26,7 @@ class NewContext(commands.Context):
         author_id = kwargs.get('author_id', self.author.id)
 
         embed = discord.Embed(
-            color=discord.Color.red()
+            color=0xff0000
         )
         embed.set_author(name=f'{title}', icon_url=error_link)
         if show_full_tb:

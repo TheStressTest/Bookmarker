@@ -71,6 +71,8 @@ class DoHelp(commands.HelpCommand):
         _commands = cog.get_commands()
         for command in cog.get_commands():
             embed.add_field(name=self.get_command_signature(command), value=f'`{command.brief if command.brief else command.help}`')
+        channel = self.get_destination()
+        await channel.send(embed=embed)
 
     async def command_not_found(self, string):
         res = ''

@@ -3,7 +3,6 @@ import traceback
 import sys
 import aiohttp
 
-from src.utils import errors
 from discord.ext import commands
 
 
@@ -28,6 +27,15 @@ class CommandErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
 
         if isinstance(error, ignored):
             return
+
+        elif isinstance(error, commands.BadArgument):
+            await ctx.error('The argument you provided was invalid.', error)
+            return
+
+        elif isinstance(error, commands.ExpectedClosingQuoteError):
+            await ctx.error('Did ya forget to add a closing quote?', error)
+            return
+
         elif isinstance(error, commands.errors.MessageNotFound):
             await ctx.error('The message you used was invalid.', error)
 
@@ -50,7 +58,9 @@ class CommandErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
             self.bot.logger.error('\n' + ''.join(traceback.format_exception(type(error), error, error.__traceback__)))
             print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
             tb = traceback.format_exception(type(error), error, error.__traceback__)
+
             print(''.join(tb), file=sys.stderr)
+
             if self.bot.webhook_url:
                 async with aiohttp.ClientSession() as session:
                     embed = discord.Embed(
@@ -63,6 +73,9 @@ class CommandErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
                     )
                     webhook = discord.Webhook.from_url(self.bot.webhook_url, adapter=discord.AsyncWebhookAdapter(session))
                     await webhook.send(username='Bookmarker errors.', embed=embed)
+
+            await ctx.error('Aw snap, an uncaught error has occurred.', error, show_full_tb=True)
+
             return
 
 

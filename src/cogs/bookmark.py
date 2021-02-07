@@ -23,6 +23,27 @@ class Bookmarking(commands.Cog):
     async def _bookmark(self, ctx):
         await ctx.send(f'Did you mean: {self.bot.prefixes.get(ctx.author.id, "~")}bookmark add <id>?')
 
+    @_bookmark.command(name='pinned',
+                       help='Bookmark all the pinned messages in the channel you execute the command in. Use flag --hidden to make all of em\' hidden')
+    async def _pinned(self, ctx, args=""):
+        parser = Arguments(add_help=False, allow_abbrev=False)
+        parser.add_argument('--hidden', action='store_true')
+        try:
+            args = parser.parse_args(shlex.split(args))
+        except Exception as e:
+            await ctx.send(e)
+        pins = await ctx.channel.pins()
+        confirm = True
+        if len(pins) > 3:
+            confirm = await ctx.prompt(f'Holdup, you are about to bookmark {len(pins)} messages, do you wanna do this?')
+
+        if confirm:
+            for message in pins:
+                await ctx.bookmark(message, args, send_messages=False)
+            await ctx.send(f'Successfully bookmarked {len(pins)} message(s).')
+        else:
+            await ctx.send('Aborting.')
+
     @commands.cooldown(1, 3, commands.BucketType.user)
     @_bookmark.command(name='add',
                        help='Add a bookmark by copying the ID or link of a message then using ~bookmark <id/link> you will only be able to get the jump url if you are viewing your bookmarks in the same server that you created them in. To avoid this use the flag --global when you create your bookmark.',
@@ -45,6 +66,7 @@ class Bookmarking(commands.Cog):
                       flags={'--show-hidden': 'Displays private flags (No arguments required.)',
                              '--show-id': 'Shows the id\'s of the bookmark.}'})
     async def _bookmarks(self, ctx, *, args: str = ''):
+        await ctx.trigger_typing()
         dm = False
 
         # arg parse stuff

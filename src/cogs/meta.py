@@ -64,7 +64,13 @@ class DoHelp(commands.HelpCommand):
         await channel.send(embed=embed)
 
     async def send_cog_help(self, cog):
-        pass
+        embed = discord.Embed(
+            title=cog.qualified_name,
+            color=self.context.bot.embed_color
+        )
+        _commands = cog.get_commands()
+        for command in cog.get_commands():
+            embed.add_field(name=self.get_command_signature(command), value=f'`{command.brief if command.brief else command.help}`')
 
     async def command_not_found(self, string):
         res = ''

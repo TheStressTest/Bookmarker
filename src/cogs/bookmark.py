@@ -23,7 +23,7 @@ class Bookmarking(commands.Cog):
     async def _bookmark(self, ctx):
         await ctx.send(f'Did you mean: {self.bot.prefixes.get(ctx.author.id, "~")}bookmark add <id>?')
 
-    @_bookmark.command(name='pinned',
+    @_bookmark.command(name='pinned', aliases=['pins'],
                        help='Bookmark all the pinned messages in the channel you execute the command in. Use flag --hidden to make all of em\' hidden')
     async def _pinned(self, ctx, args=""):
         parser = Arguments(add_help=False, allow_abbrev=False)

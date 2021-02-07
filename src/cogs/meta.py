@@ -21,7 +21,8 @@ class DoHelp(commands.HelpCommand):
         )
         embed.add_field(name='Help', value=command.help, inline=False)
 
-        embed.add_field(name='TL;DR', value=command.brief, inline=False)
+        if command.brief:
+            embed.add_field(name='TL;DR', value=command.brief, inline=False)
 
         if command.aliases:
             embed.add_field(name='Aliases', value=', '.join(command.aliases), inline=False)
@@ -30,14 +31,17 @@ class DoHelp(commands.HelpCommand):
         await channel.send(embed=embed)
 
     async def send_group_help(self, group):
+
         embed = discord.Embed(
             title=group.name,
         )
         embed.add_field(name='Help', value=group.help, inline=False)
 
-        embed.add_field(name='TL;DR', value=group.brief, inline=False)
+        if group.brief:
+            embed.add_field(name='TL;DR', value=group.brief, inline=False)
 
-        embed.add_field(name='Commands:', value=', '.join(str(group.walk_commands())), inline=False)
+        for command in group.walk_commands():
+            embed.add_field(name=command.qualified_name, value=f'`{self.get_command_signature(command)}`')
 
         channel = self.get_destination()
         await channel.send(embed=embed)

@@ -49,7 +49,7 @@ class CommandErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
                 pass
 
         elif isinstance(error, commands.CommandOnCooldown):
-            await ctx.error('This command is on cooldown for you.', error)
+            await ctx.error(f'Slow down! You are on cooldown. Try again in {round(error.retry_after)} seconds!', error)
 
         elif isinstance(error, commands.MissingRequiredArgument):
             await ctx.error(error, error)

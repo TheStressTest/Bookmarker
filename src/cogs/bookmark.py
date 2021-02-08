@@ -47,9 +47,7 @@ class Bookmarking(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.user)
     @_bookmark.command(name='add',
                        help='Add a bookmark by copying the ID or link of a message then using ~bookmark <id/link> you will only be able to get the jump url if you are viewing your bookmarks in the same server that you created them in. To avoid this use the flag --global when you create your bookmark.',
-                       brief='Create a bookmark with some flags.',
-                       flags={
-                           '--hidden': 'Makes your bookmark hidden to view hidden bookmarks run ~bookmarks --show-hidden'})
+                       brief='Create a bookmark with some flags.',)
     async def _add(self, ctx, message: discord.Message, *, args: str = ''):
         parser = Arguments(add_help=False, allow_abbrev=False)
         parser.add_argument('--hidden', action='store_true')

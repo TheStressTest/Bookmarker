@@ -36,6 +36,7 @@ class Bookmarking(commands.Cog):
         confirm = True
         if len(pins) > 3:
             confirm = await ctx.prompt(f'Holdup, you are about to bookmark {len(pins)} messages, do you wanna do this?')
+        
         if len(pins) == 0:
             await ctx.send('There are no bookmarks to pin.')
             return

@@ -106,11 +106,13 @@ class NewContext(commands.Context):
             await message.delete()
 
     async def delete_bookmark(self, _id):
+        """Deletes a bookmark"""
         pool = self.bot.db
         await pool.execute('DELETE FROM bookmarks WHERE database_id=$1', _id)
         await pool.execute('DELETE FROM semi_cached_bookmarks WHERE database_id=$1', _id)
 
     async def bookmark(self, message, args, cache=True, send_messages=True):
+        """Creates a bookmark"""
         pool = self.bot.db
         query = 'INSERT INTO bookmarks (bookmark_owner_id, message_id, channel_id, is_hidden) VALUES ($1, $2, $3, $4)'
         try:
@@ -129,6 +131,7 @@ class NewContext(commands.Context):
                 await self.send('You can\'t bookmark the same message twice.')
 
     async def bookmark_from_cache(self, _id):
+        """Returns a cached bookmark"""
         pool = self.bot.db
         query = 'SELECT * FROM semi_cached_bookmarks WHERE database_id=$1'
         bookmark = await pool.fetchrow(query, _id)

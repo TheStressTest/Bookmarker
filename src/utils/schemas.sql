@@ -39,3 +39,23 @@ TABLESPACE pg_default;
 
 ALTER TABLE public.bookmarks
     OWNER to postgres;
+
+--- function for deleting bookmark from cache.
+
+CREATE FUNCTION delete_cached() 
+   RETURNS TRIGGER 
+   LANGUAGE PLPGSQL
+AS $$
+BEGIN
+   DELETE FROM semi_cached_bookmarks WHERE database_id = OLD.database_id;
+   RETURN NULL;
+END;
+$$
+
+-- actual trigger that auto deletes it.
+
+CREATE TRIGGER del_from_cached
+    AFTER DELETE
+    ON bookmarks
+    FOR EACH ROW
+        EXECUTE PROCEDURE delete_cached();

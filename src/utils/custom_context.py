@@ -108,8 +108,7 @@ class NewContext(commands.Context):
     async def delete_bookmark(self, _id):
         """Deletes a bookmark"""
         pool = self.bot.db
-        await pool.execute('DELETE FROM bookmarks WHERE database_id=$1', _id)
-        await pool.execute('DELETE FROM semi_cached_bookmarks WHERE database_id=$1', _id)
+        await pool.execute('DELETE FROM bookmarks WHERE database_id=$1', _id)  # database trigger should handle the rest.
 
     async def bookmark(self, message, args, cache=True, send_messages=True):
         """Creates a bookmark"""

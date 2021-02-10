@@ -92,10 +92,21 @@ class Meta(commands.Cog, name='Config'):
         self.bot = bot
 
     # sets your prefix.
-    @commands.command(name='prefix', help='Set your custom prefix using ~prefix <prefix>')
+    @commands.command(name='prefix', aliases=['setprefix'], help='Set your custom prefix using ~prefix <prefix>')
     async def set_prefix(self, ctx,  prefix: str):
-        query = 'INSERT INTO prefixes (prefix, owner_id) VALUES ($1, $2) ON CONFLICT (owner_id) DO UPDATE SET prefix = $3'
-        await self.bot.db.execute(query, prefix, ctx.author.id, prefix)
+        if prefix == self.bot.prefixes[ctx.author.id]:
+            await ctx.send('That is already your prefix!')
+            return
+
+        if prefix == self.bot.command_prefix:
+            self.bot.prefixes.pop(ctx.author.id)
+            query = 'DELETE FROM prefixes WHERE owner_id = $1'
+            await self.bot.db.execute(query, ctx.author.id)
+            await ctx.send('Reset your prefix.')
+            return
+
+        query = 'INSERT INTO prefixes (prefix, owner_id) VALUES ($1, $2) ON CONFLICT (owner_id) DO UPDATE SET prefix = $2'
+        await self.bot.db.execute(query, prefix, ctx.author.id)
         self.bot.prefixes[ctx.author.id] = str(prefix)
         await ctx.send(f'Successfully set your prefix to {prefix}')
 

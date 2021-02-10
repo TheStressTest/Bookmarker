@@ -94,7 +94,7 @@ class Meta(commands.Cog, name='Config'):
     # sets your prefix.
     @commands.command(name='prefix', aliases=['setprefix'], help='Set your custom prefix using ~prefix <prefix>')
     async def set_prefix(self, ctx,  prefix: str):
-        if prefix == self.bot.prefixes.get(ctx.author.id, '~'):
+        if prefix == await self.bot.get_prefix(ctx.message):
             await ctx.send('That is already your prefix!')
             return
 

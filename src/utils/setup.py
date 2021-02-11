@@ -1,5 +1,7 @@
 import json
 
+print('Starting setup')
+
 env = """
 postgresql=
 default_prefix=~

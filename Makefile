@@ -2,6 +2,8 @@ PYTHON = /usr/bin/python3
 VENV = venv/bin/python
 
 build: venv requirements
+	export PYTHONPATH=$$PWD
+	$(PYTHON) src/utils/setup.py
 	-cp devbot.service /etc/systemd/system
 	@cat LICENSE
 

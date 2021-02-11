@@ -1,0 +1,12 @@
+[Unit]
+Description=Discord bot.
+
+[Service]
+User=devbot
+Environment=PYTHONPATH=/home/Devbot/Devbot
+WorkingDirectory=/home/Devbot/Devbot
+ExecStart=/home/Devbot/Devbot/venv/bin/python src/bot.py
+TimeoutSec=30s
+
+[Install]
+WantedBy=multi-user.target

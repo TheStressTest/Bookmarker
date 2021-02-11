@@ -12,3 +12,11 @@ webhook-url=
 
 with open('src/.env', 'w') as tf:
     tf.write(env)
+
+static_config = {
+    "blacklisted-users": [],
+    "blacklisted-guilds": []
+}
+
+with open('src/static-config.json', 'w') as cf:
+    json.dump(static_config, cf, indent=4)

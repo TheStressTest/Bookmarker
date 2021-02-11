@@ -1,5 +1,6 @@
 [Unit]
 Description=Discord bot.
+After=network-online.target
 
 [Service]
 User=devbot

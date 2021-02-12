@@ -1,6 +1,4 @@
-if __name__ == '__main__':
-    print('Refrain from running this file directly, instead use the command: make')
-    exit(1)
+#!usr/bin/python3
 import json
 
 
@@ -23,3 +21,5 @@ static_config = {
 
 with open('src/static-config.json', 'w') as cf:
     json.dump(static_config, cf, indent=4)
+
+print('Completed setup.')

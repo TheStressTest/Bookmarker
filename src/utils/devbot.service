@@ -3,7 +3,7 @@ Description=Discord bot.
 After=network-online.target
 
 [Service]
-User=devbot
+User=Devbot
 Environment=PYTHONPATH=/home/Devbot/Devbot
 WorkingDirectory=/home/Devbot/Devbot
 ExecStart=/home/Devbot/Devbot/venv/bin/python src/bot.py

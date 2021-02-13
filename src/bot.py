@@ -92,7 +92,7 @@ class BotBase(commands.AutoShardedBot):
 
 
 bot_creds = {
-    'token': os.getenv('TOKEN'),
+    'token': os.getenv('token'),
     'ignored_cogs': [],
     'command_prefix': os.getenv('default_prefix'),
     'postgresql': os.getenv('postgresql'),

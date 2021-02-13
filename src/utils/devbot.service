@@ -8,7 +8,7 @@ Environment=PYTHONPATH=/home/Devbot/Devbot
 WorkingDirectory=/home/Devbot/Devbot
 ExecStart=/home/Devbot/Devbot/venv/bin/python src/bot.py
 TimeoutSec=30s
-Restart=on-failure
+Restart=always
 
 [Install]
 WantedBy=multi-user.target

@@ -13,6 +13,11 @@ class DevTools(commands.Cog, command_attrs=dict(hidden=True)):
             return True
         else:
             raise commands.NotOwner()
+            
+    @commands.command(name='restart', aliases=['reboot'])
+    async def _restart(self, ctx):
+        await ctx.send('See ya in a bit. :wave:')
+        await ctx.bot.logout()
 
     @commands.group(name='devmode')
     async def _devmode(self, ctx):

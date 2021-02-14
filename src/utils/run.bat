@@ -2,10 +2,6 @@
 
 @echo off
 
-:: making sure path is correct
-cd .. 
-cd ..
-
 :: allowd parent dir imports
 set PYTHONPATH=%cd%
 

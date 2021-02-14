@@ -1,9 +1,5 @@
 #!bin/bash
 
-# adjusting path
-cd ..
-cd ..
-
 # set env var
 PYTHONPATH=$pwd
 

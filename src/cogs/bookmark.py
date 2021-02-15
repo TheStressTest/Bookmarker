@@ -18,7 +18,7 @@ class Bookmarking(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    # TODO add more bookmark commands
+    # TODO add paginator on ~bookmarks
     @commands.group(name='bookmark',
                     help='Commands related to bookmarking messages.', invoke_without_command=True)
     async def _bookmark(self, ctx):

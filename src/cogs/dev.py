@@ -29,7 +29,7 @@ class DevTools(commands.Cog, command_attrs=dict(hidden=True)):
     async def _sync(self, ctx):
         confirm = await ctx.prompt('Are you sure you want to sync this bot? lol')
         if not confirm:
-            await ctx.send('Aborting.')
+            await ctx.send('Aborting...')
             return
         subprocess.run(['git', 'merge', 'Development'])
         out = subprocess.run(['git', 'pull'], capture_output=True, text=True)

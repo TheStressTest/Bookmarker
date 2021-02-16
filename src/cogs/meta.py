@@ -14,7 +14,8 @@ class DoHelp(commands.HelpCommand):
     async def send_bot_help(self, mapping):
         embed = discord.Embed(
             title='Bookmarker help menu.',
-            color=self.context.bot.embed_color
+            color=self.context.bot.embed_color,
+            description='```diff\n- <> = Required argument\n- [] = Optional argument\n+ Do not use these in commands!```'
         )
         for cog, command in mapping.items():
             command_names = []

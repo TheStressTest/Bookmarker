@@ -1,9 +1,11 @@
 import sys
 import discord
 import traceback
+from datetime import datetime
 
 from discord.ext import commands
 from src.utils.fuzzy import extract
+from src.utils.custom_funcs import trim_message
 
 
 class DoHelp(commands.HelpCommand):
@@ -15,7 +17,8 @@ class DoHelp(commands.HelpCommand):
         embed = discord.Embed(
             title='Bookmarker help menu.',
             color=self.context.bot.embed_color,
-            description='```diff\n- <> = Required argument\n- [] = Optional argument\n+ Do not use these in commands!```'
+            description='```diff\n- <> = Required argument\n- [] = Optional argument\n+ Do not use these in commands!```',
+            timestamp=datetime.utcnow()
         )
         for cog, command in mapping.items():
             command_names = []
@@ -27,7 +30,7 @@ class DoHelp(commands.HelpCommand):
                     command_names.append(_command.qualified_name)
 
             if command_names:
-                embed.add_field(name=cog.qualified_name, value=f'`{", ".join(command_names)}`')
+                embed.add_field(name=cog.qualified_name, value=f'`{await trim_message(", ".join(command_names), 20)}`')
         
         embed.add_field(name='Cool links:', value='[`Support Server`](https://discord.gg/h8QKA7EJfF)\n[`Invite`](https://discord.com/api/oauth2/authorize?client_id=790632534350233630&permissions=67488832&scope=bot)\n[`Beta Invite`](https://discord.com/api/oauth2/authorize?client_id=811280192298811423&permissions=67488832&scope=bot)', inline=False)
 

@@ -31,6 +31,7 @@ class DevTools(commands.Cog, command_attrs=dict(hidden=True)):
         if not confirm:
             await ctx.send('Aborting.')
             return
+        subprocess.run(['git', 'merge', 'Development'])
         out = subprocess.run(['git', 'pull'], capture_output=True, text=True)
         await ctx.send(f'```diff\n{out.stdout}```')
         await self.bot.logout()

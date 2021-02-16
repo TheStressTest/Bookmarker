@@ -18,6 +18,7 @@ class Bookmarking(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    # TODO add paginator on ~bookmarks and webhook for support server
     @commands.group(name='bookmark',
                     help='Commands related to bookmarking messages.', invoke_without_command=True)
     async def _bookmark(self, ctx):
@@ -63,9 +64,7 @@ class Bookmarking(commands.Cog):
 
     @commands.command(name='bookmarks',
                       brief='View your bookmarks.',
-                      help='Use ~bookmarks to view all your bookmarks, you can add and remove folders.',
-                      flags={'--show-hidden': 'Displays private flags (No arguments required.)',
-                             '--show-id': 'Shows the id\'s of the bookmark.}'})
+                      help='Use ~bookmarks to view all your bookmarks, you can add and remove folders.',)
     async def _bookmarks(self, ctx, *, args: str = ''):
         await ctx.trigger_typing()
         dm = False

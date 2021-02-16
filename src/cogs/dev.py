@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from tabulate import tabulate
+import subprocess
 # from src.utils.fuzzy import extract
 
 
@@ -13,11 +14,26 @@ class DevTools(commands.Cog, command_attrs=dict(hidden=True)):
             return True
         else:
             raise commands.NotOwner()
-            
-    @commands.command(name='restart', aliases=['reboot'])
+
+    @commands.group(name='dev')
+    async def _dev(self, ctx):
+        pass
+
+    @_dev.command(name='restart', aliases=['reboot'])
     async def _restart(self, ctx):
         await ctx.send('See ya in a bit. :wave:')
+        await self.bot.change_presence(activity=discord.Game(name='Restarting...'))
         await ctx.bot.logout()
+    
+    @_dev.command(name='sync')
+    async def _sync(self, ctx):
+        out = subprocess.run(['git', 'pull'], capture_output=True, text=True)
+        await ctx.send(f'```diff\n{out.stdout}```')
+
+    @_dev.command(name='call')
+    async def _call(self, ctx, function):
+        self.bot.dispatch(function)
+        await ctx.send('done')
 
     @commands.group(name='devmode')
     async def _devmode(self, ctx):

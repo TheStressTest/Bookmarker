@@ -27,8 +27,13 @@ class DevTools(commands.Cog, command_attrs=dict(hidden=True)):
     
     @_dev.command(name='sync')
     async def _sync(self, ctx):
+        confirm = await ctx.prompt('Are you sure you want to sync this bot? lol')
+        if not confirm:
+            await ctx.send('ok, aborting.')
+            return
         out = subprocess.run(['git', 'pull'], capture_output=True, text=True)
         await ctx.send(f'```diff\n{out.stdout}```')
+        await self.bot.logout()
 
     @_dev.command(name='call')
     async def _call(self, ctx, function):

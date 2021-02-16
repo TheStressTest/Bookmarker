@@ -27,6 +27,8 @@ class DoHelp(commands.HelpCommand):
 
             if command_names:
                 embed.add_field(name=cog.qualified_name, value=f'`{", ".join(command_names)}`')
+        
+        embed.add_field(name='Cool links:', value='[`Support Server`](https://discord.gg/h8QKA7EJfF)\n[`Invite`](https://discord.com/api/oauth2/authorize?client_id=790632534350233630&permissions=117824&scope=bot)\n[`Beta Invite`](https://discord.com/api/oauth2/authorize?client_id=811280192298811423&permissions=67488832&scope=bot)', inline=False)
 
         channel = self.get_destination()
         await channel.send(embed=embed)

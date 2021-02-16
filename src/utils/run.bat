@@ -5,6 +5,4 @@
 :: allowd parent dir imports
 set PYTHONPATH=%cd%
 
-echo "%PYTHONPATH%"
-
 %cd%\Venv\Scripts\python.exe src\bot.py

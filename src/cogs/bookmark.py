@@ -64,9 +64,7 @@ class Bookmarking(commands.Cog):
 
     @commands.command(name='bookmarks',
                       brief='View your bookmarks.',
-                      help='Use ~bookmarks to view all your bookmarks, you can add and remove folders.',
-                      flags={'--show-hidden': 'Displays private flags (No arguments required.)',
-                             '--show-id': 'Shows the id\'s of the bookmark.}'})
+                      help='Use ~bookmarks to view all your bookmarks, you can add and remove folders.',)
     async def _bookmarks(self, ctx, *, args: str = ''):
         await ctx.trigger_typing()
         dm = False

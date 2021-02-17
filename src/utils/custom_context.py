@@ -135,3 +135,9 @@ class NewContext(commands.Context):
         query = 'SELECT * FROM semi_cached_bookmarks WHERE database_id=$1'
         bookmark = await pool.fetchrow(query, _id)
         return bookmark
+
+    async def fetch_bookmark(self, _id):
+        pool = self.bot.db
+        query = "SELECT * FROM bookmarks WHERE database_id = $1"
+        pool.execute(query, _id)
+

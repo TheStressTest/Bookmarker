@@ -13,6 +13,12 @@ class Arguments(argparse.ArgumentParser):
     def error(self, message):
         raise RuntimeError(message)
 
+# TODO finish this
+class Bookmark(commands.Converter):
+    async def convert(self, ctx, argument: int):
+        bookmark_contents = await ctx.bookmark_from_cache(argument)
+        bookmark = await ctx.fetch_bookmark(argument)
+
 
 class Bookmarking(commands.Cog):
     def __init__(self, bot):

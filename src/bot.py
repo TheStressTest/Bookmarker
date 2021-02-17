@@ -14,7 +14,7 @@ from utils.custom_context import NewContext
 from cogs.meta import DoHelp
 from logging.handlers import RotatingFileHandler
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 load_dotenv('src/.env')
 

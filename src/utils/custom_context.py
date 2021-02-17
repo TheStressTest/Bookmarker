@@ -139,5 +139,6 @@ class NewContext(commands.Context):
     async def fetch_bookmark(self, _id):
         pool = self.bot.db
         query = "SELECT * FROM bookmarks WHERE database_id = $1"
-        pool.execute(query, _id)
+        bookmark = await pool.fetchrow(query, _id)
+        return bookmark
 

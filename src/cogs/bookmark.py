@@ -84,7 +84,7 @@ class Bookmarking(commands.Cog):
             await ctx.send(e)
         if args.hidden:
             dm = True
-        paginator = commands.Paginator(prefix='', suffix='')
+        paginator = commands.Paginator(prefix='', suffix='', max_size=1)
         bookmarks = await self.bot.db.fetch('SELECT * from bookmarks WHERE bookmark_owner_id = $1',
                                             ctx.author.id)
         paginator.add_line(f'Total Bookmarks: {len(bookmarks)}\n')

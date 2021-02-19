@@ -13,12 +13,6 @@ class Arguments(argparse.ArgumentParser):
     def error(self, message):
         raise RuntimeError(message)
 
-# # TODO finish this
-# class Bookmark(commands.Converter):
-#     async def convert(self, ctx, argument: int):
-#         pass
-
-
 class Bookmarking(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -84,7 +78,7 @@ class Bookmarking(commands.Cog):
             await ctx.send(e)
         if args.hidden:
             dm = True
-        paginator = commands.Paginator(prefix='', suffix='', max_size=1)
+        paginator = commands.Paginator(prefix='', suffix='')
         bookmarks = await self.bot.db.fetch('SELECT * from bookmarks WHERE bookmark_owner_id = $1',
                                             ctx.author.id)
         paginator.add_line(f'Total Bookmarks: {len(bookmarks)}\n')
@@ -108,15 +102,16 @@ class Bookmarking(commands.Cog):
             else:
                 info = bookmark['database_id']
 
-            if not dm:
-                if not bookmark['is_hidden']:
+            if not bookmark['pinned']:
+                if not dm:
+                    if not bookmark['is_hidden']:
+                        paginator.add_line(
+                            f'[`{await trim_message(message_info["content"])}`]({message_info["jump_url"]}) • {info}')
+                else:
                     paginator.add_line(
                         f'[`{await trim_message(message_info["content"])}`]({message_info["jump_url"]}) • {info}')
-            else:
-                paginator.add_line(
-                    f'[`{await trim_message(message_info["content"])}`]({message_info["jump_url"]}) • {info}')
 
-                paginator.add_line(f'`Deleted message.`')
+                # paginator.add_line(f'`Deleted message.`')
         # sends message, TODO add menu
         for page in paginator.pages:
             embed = discord.Embed(

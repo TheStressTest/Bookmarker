@@ -35,12 +35,6 @@ class Utilities(commands.Cog):
         )
         await message.edit(embed=embed)
 
-    @commands.command(name='stats',
-                      brief='Get some stats about me.',
-                      help='Use ~stats to get info on me such as how many commands were run since the last restart or how much ram Im using, stuff like that.')
-    async def _stats(self, ctx):
-        await ctx.send(f'Commands since last reboot: {self.bot.commandsSinceLogon}\nI am currently in {len(self.bot.guilds)} guilds.')
-
     @commands.command(name='system', aliases=['sys'], help='Get useful information about the system, including ram, physical memory, process id, uptime & much more.', brief='Get system info.')
     async def _sys(self, ctx):
         self.process = psutil.Process(os.getpid())

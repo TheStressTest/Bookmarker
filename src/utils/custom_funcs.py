@@ -3,7 +3,7 @@ from src.utils.errors import InvalidTimeFormat
 
 async def trim_message(message, length: int = 12):
     """Trims a message and adds ... at the end"""
-    nl = '\n'
+    nl = "\n"
     if len(message) <= length:
         return message
     else:
@@ -12,15 +12,15 @@ async def trim_message(message, length: int = 12):
 
 async def time_convert(time):
     """Converts something like 10m into 600 seconds."""
-    if time[-1:].lower() == 's':
+    if time[-1:].lower() == "s":
         formatted_time = int(time[:-1])
-    elif time[-1:].lower() == 'm':
+    elif time[-1:].lower() == "m":
         formatted_time = int(time[:-1]) * 60
-    elif time[-1:].lower() == 'h':
+    elif time[-1:].lower() == "h":
         formatted_time = int(time[:-1]) * 3600
-    elif time[-1:].lower() == 'd':
+    elif time[-1:].lower() == "d":
         formatted_time = int(time[:-1]) * 86400
-    elif time[-1:].lower() == 'w':
+    elif time[-1:].lower() == "w":
         formatted_time = int(time[:-1]) * 604800
     else:
         raise InvalidTimeFormat

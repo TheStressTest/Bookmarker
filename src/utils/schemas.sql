@@ -42,8 +42,8 @@ ALTER TABLE public.bookmarks
 
 --- function for deleting bookmark from cache.
 
-CREATE FUNCTION delete_cached() 
-   RETURNS TRIGGER 
+CREATE FUNCTION delete_cached()
+   RETURNS TRIGGER
    LANGUAGE PLPGSQL
 AS $$
 BEGIN
